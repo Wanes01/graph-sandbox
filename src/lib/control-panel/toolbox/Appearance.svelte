@@ -13,8 +13,6 @@
     const checkboxes = filterInput('checkbox');
     const selects = filterInput('select');
     const colors = filterInput('color');
-
-    colors.forEach((color) => (SETTINGS.ui[color.id] = color.default));
 </script>
 
 <ToolBox legend="Appearance" direction="col">

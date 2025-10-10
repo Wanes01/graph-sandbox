@@ -1,4 +1,8 @@
 import { GraphHistoryManager } from "$lib/static/graph-history.svelte";
+import dagre from "cytoscape-dagre";
+import cytoscape from "cytoscape";
+
+cytoscape.use(dagre);
 
 /**
  * Mimics an enum for the quick edit mode types.
@@ -39,7 +43,8 @@ export const LAYOUTS = [
   "concentric",
   "breadthfirst",
   "cose",
-  "random"
+  "random",
+  "dagre"
 ];
 
 export const GRAPH_DATA = $state({
