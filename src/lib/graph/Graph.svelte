@@ -6,6 +6,8 @@
     import { initUISync } from '$lib/static/graph-ui-sync.svelte';
     import cytoscape from 'cytoscape';
 
+    let { width } = $props();
+
     /** @type {any} */
     let container;
 
@@ -75,4 +77,4 @@
     });
 </script>
 
-<div bind:this={container} class="graph relative h-screen w-4/5"></div>
+<div bind:this={container} class="graph relative h-screen" style="width: {width}"></div>
