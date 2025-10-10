@@ -14,9 +14,9 @@
             container: container,
 
             elements: [
-                { data: { id: 'a', label: 'Nodo A' } },
-                { data: { id: 'b', label: 'Nodo B' } },
-                { data: { id: 'c', label: 'Nodo C' } },
+                { data: { id: 'a', label: 'Nodo A', status: 'normal' } },
+                { data: { id: 'b', label: 'Nodo B', status: 'normal' } },
+                { data: { id: 'c', label: 'Nodo C', status: 'normal' } },
                 { data: { id: 'ab', source: 'a', target: 'b', weight: 0, symbolicWeight: '0' } },
                 { data: { id: 'bc', source: 'b', target: 'c', weight: 0, symbolicWeight: '0' } },
                 { data: { id: 'ca', source: 'c', target: 'a', weight: 0, symbolicWeight: '0' } }

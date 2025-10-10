@@ -46,10 +46,15 @@ export function initUISync() {
      */
     $effect(() => {
         ['node', 'node[label]'].forEach(sel => {
-            cy?.style().selector(sel).style({
-                'background-color': SETTINGS.ui['vertex-color'],
-                'text-outline-color': SETTINGS.ui['vertex-color']
-            }).update();
+            cy?.style()
+                /* Excludes the restyle of all nodes that don't have the normal status:
+                every special status must have its own vertex color  */
+                .selector(sel + '[status = "normal"]')
+                .style({
+                    'background-color': SETTINGS.ui['vertex-color'],
+                    'text-outline-color': SETTINGS.ui['vertex-color']
+                })
+                .update();
         });
     });
 
