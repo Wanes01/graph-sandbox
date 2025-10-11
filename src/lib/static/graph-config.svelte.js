@@ -26,6 +26,7 @@ export const SETTINGS = $state({
   /** @type {Record<string, any>} */
   ui: {
     'layout': 'circle',
+    'arrow-shape': 'triangle',
     'vertex-color': '#007bff',
     'edge-color': '#ccc',
     'show-labels': true,
@@ -45,6 +46,21 @@ export const LAYOUTS = [
   "cose",
   "random",
   "dagre"
+];
+
+/**
+ * Available arrow shapes
+ */
+export const ARROW_SHAPES = [
+  "none",
+  "triangle",
+  "triangle-backcurve",
+  "vee",
+  "tee",
+  "square",
+  "circle",
+  "diamond",
+  "chevron"
 ];
 
 export const GRAPH_DATA = $state({

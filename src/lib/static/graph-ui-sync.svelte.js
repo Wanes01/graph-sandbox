@@ -67,4 +67,13 @@ export function initUISync() {
             'target-arrow-color': SETTINGS.ui['edge-color']
         }).update();
     });
+
+    /**
+     * Changes edges arrow type.
+     */
+    $effect(() => {
+        cy?.style().selector('edge').style({
+            'target-arrow-shape': SETTINGS.ui['arrow-shape']
+        }).update();
+    })
 }

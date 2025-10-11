@@ -6,7 +6,7 @@
     let {
         value = $bindable(),
         label,
-        placeholder = 'Seleziona colore...',
+        placeholder = 'Select color...',
         disabled = false
     } = $props();
 

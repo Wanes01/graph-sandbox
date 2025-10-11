@@ -60,6 +60,7 @@
                         'line-color': SETTINGS.ui['edge-color'],
                         'target-arrow-color': SETTINGS.ui['edge-color'],
                         'target-arrow-shape': 'triangle',
+                        'arrow-scale': 1.8,
                         'curve-style': 'bezier',
                         'font-size': 16
                     }

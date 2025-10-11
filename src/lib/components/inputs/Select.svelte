@@ -5,7 +5,7 @@
         value = $bindable(),
         options = [],
         label,
-        placeholder = 'Seleziona...',
+        placeholder = 'Select...',
         disabled = false
     } = $props();
 
