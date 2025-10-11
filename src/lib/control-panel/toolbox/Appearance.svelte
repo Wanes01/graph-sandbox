@@ -4,6 +4,7 @@
     import { SETTINGS } from '$lib/static/graph-config.svelte';
     import CheckBox from '$lib/components/inputs/CheckBox.svelte';
     import Select from '$lib/components/inputs/Select.svelte';
+    import Color from '$lib/components/inputs/Color.svelte';
 
     /**
      * @param {string} type
@@ -41,14 +42,7 @@
     {/each}
     {#each colors as color}
         <li class="flex flex-row items-center justify-between gap-3">
-            <label for={color.id}>{color.label}</label>
-            <input
-                type="color"
-                name={color.id}
-                id={color.id}
-                class="w-1/2"
-                bind:value={SETTINGS.ui[color.id]}
-            />
+            <Color bind:value={SETTINGS.ui[color.id]} label={color.label} />
         </li>
     {/each}
 </ToolBox>
