@@ -1,7 +1,8 @@
+<!-- @ts-nocheck -->
 <script>
     // @ts-nocheck
 
-    import { blur } from 'svelte/transition';
+    import ColorPicker from 'svelte-awesome-color-picker';
 
     let {
         value = $bindable(),
@@ -11,27 +12,11 @@
     } = $props();
 
     let isPickerOpen = $state(false);
-    /**
-     * @type {HTMLInputElement}
-     */
-    let inputRef;
+    let htmlElement = null;
 
     function togglePicker() {
         if (!disabled) {
             isPickerOpen = !isPickerOpen;
-            if (isPickerOpen) {
-                // Focus the hidden color input to open native picker
-                setTimeout(() => inputRef?.click(), 0);
-            }
-        }
-    }
-
-    /**
-     * @param {{ target: { value: string; }; }} event
-     */
-    function handleColorChange(event) {
-        if (!disabled) {
-            value = event.target.value;
         }
     }
 
@@ -39,15 +24,24 @@
      * @param {{ target: { closest: (arg0: string) => any; }; }} event
      */
     function handleClickOutside(event) {
-        if (!event.target.closest('.color-container')) {
+        if (htmlElement && !htmlElement.contains(event.target)) {
             isPickerOpen = false;
+        }
+    }
+
+    /**
+     * @param {{ detail: { hex: any; }; }} event
+     */
+    function handleColorChange(event) {
+        if (!disabled) {
+            value = event.detail.hex;
         }
     }
 </script>
 
 <svelte:window onclick={handleClickOutside} />
 
-<div class="color-container relative w-full">
+<div bind:this={htmlElement} class="color-container relative w-full">
     {#if label}
         <p class="mb-1.5 block text-sm font-medium text-slate-700">
             {label}
@@ -66,10 +60,9 @@
         {disabled}
     >
         <div
-            class="flex h-8 w-14 items-center justify-center transition-all duration-200"
-            style="background-color: {value};"
+            class="flex h-8 w-14 items-center justify-center transition-all duration-100"
+            style="background-color: {value || '#000000'};"
         ></div>
-
         <div class="flex flex-1 flex-row items-center justify-between px-3">
             <p
                 class="text-left text-sm font-medium {disabled
@@ -80,7 +73,6 @@
             >
                 {value || placeholder}
             </p>
-
             <svg
                 class="ml-2 h-4 w-4 flex-shrink-0 {disabled ? 'text-slate-400' : 'text-slate-500'}"
                 fill="none"
@@ -97,13 +89,25 @@
         </div>
     </button>
 
-    <!-- Hidden native color input -->
-    <input
-        bind:this={inputRef}
-        type="color"
-        bind:value
-        onchange={handleColorChange}
-        class="pointer-events-none absolute opacity-0"
-        {disabled}
-    />
+    {#if isPickerOpen && !disabled}
+        <div
+            class="absolute top-2/3 right-full z-50 mr-2 -translate-y-1/2 rounded-lg border border-slate-200 bg-white shadow-lg shadow-black"
+        >
+            <ColorPicker
+                bind:hex={value}
+                on:input={handleColorChange}
+                isDialog={false}
+                isAlpha={false}
+            />
+        </div>
+    {/if}
 </div>
+
+<style>
+    /* Personalizzazione opzionale del color picker */
+    :global(.s-_kxRDwYWTbvm) {
+        font-family: inherit;
+        margin: 0 !important;
+        border: 0 !important;
+    }
+</style>

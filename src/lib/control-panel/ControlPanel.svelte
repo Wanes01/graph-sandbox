@@ -40,10 +40,8 @@
             class="flex flex-col gap-3 transition-opacity duration-300"
             style="opacity: {open ? '1' : '0'}; pointer-events: {open ? 'auto' : 'none'}"
         >
-            {#if open}
-                <QuickEdit />
-                <Appearance />
-            {/if}
+            <QuickEdit />
+            <Appearance />
         </div>
     </div>
 </aside>

@@ -50,7 +50,8 @@
                 {
                     selector: 'node[status = "begin-link"]',
                     style: {
-                        'background-color': '#eb7d34'
+                        'background-color': '#eb7d34',
+                        'text-outline-color': '#eb7d34'
                     }
                 },
                 {

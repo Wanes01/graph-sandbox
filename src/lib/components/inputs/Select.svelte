@@ -1,6 +1,11 @@
 <script>
     import { slide } from 'svelte/transition';
 
+    /**
+     * @type {HTMLElement | null}
+     */
+    let htmlElement = null;
+
     let {
         value = $bindable(),
         options = [],
@@ -33,7 +38,7 @@
     // Closes the dropdown when user clicks outside of it
     // @ts-ignore
     function handleClickOutside(event) {
-        if (!event.target.closest('.select-container')) {
+        if (htmlElement && !htmlElement.contains(event.target)) {
             isOpen = false;
         }
     }
@@ -41,7 +46,7 @@
 
 <svelte:window onclick={handleClickOutside} />
 
-<div class="select-container relative w-full">
+<div bind:this={htmlElement} class="select-container relative w-full">
     {#if label}
         <p class="mb-1.5 block text-sm font-medium text-slate-700">
             {label}

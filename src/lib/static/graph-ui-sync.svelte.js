@@ -56,6 +56,37 @@ export function initUISync() {
                 })
                 .update();
         });
+
+        const complementary = complementaryColor(SETTINGS.ui['vertex-color']);
+
+        cy?.style()
+            .selector('node[status = "begin-link"]')
+            .style({
+                'background-color': complementary,
+                'text-outline-color': complementary
+            })
+            .update();
+
+        /**
+         * @param {string} hex
+         */
+        function complementaryColor(hex) {
+            // Removes the #
+            const cleanHex = hex.replace('#', '');
+
+            // extracts the R G B components
+            const r = parseInt(cleanHex.slice(0, 2), 16);
+            const g = parseInt(cleanHex.slice(2, 4), 16);
+            const b = parseInt(cleanHex.slice(4, 6), 16);
+
+            // computes the complementary color
+            const compR = (255 - r).toString(16).padStart(2, '0');
+            const compG = (255 - g).toString(16).padStart(2, '0');
+            const compB = (255 - b).toString(16).padStart(2, '0');
+
+            // builds the final hex
+            return `#${compR}${compG}${compB}`.toUpperCase();
+        }
     });
 
     /**
