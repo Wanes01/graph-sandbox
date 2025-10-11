@@ -2,6 +2,7 @@
     import ToolBox from '$lib/components/ToolBox.svelte';
     import { appearanceData } from '$lib/static/control-panel-config.svelte';
     import { SETTINGS } from '$lib/static/graph-config.svelte';
+    import CheckBox from '$lib/components/inputs/CheckBox.svelte';
 
     /**
      * @param {string} type
@@ -16,18 +17,11 @@
 </script>
 
 <ToolBox legend="Appearance" direction="col">
-    {#each checkboxes as checkbox}
-        <li class="flex flex-row items-center gap-3">
-            <input
-                type="checkbox"
-                name={checkbox.id}
-                id={checkbox.id}
-                class="h-4.5 w-4.5 accent-blue-400"
-                bind:checked={SETTINGS.ui[checkbox.id]}
-            />
-            <label for={checkbox.id}>{checkbox.label}</label>
-        </li>
-    {/each}
+    <li class="flex flex-row items-center gap-3">
+        {#each checkboxes as checkbox}
+            <CheckBox bind:checked={SETTINGS.ui[checkbox.id]} label={checkbox.label} />
+        {/each}
+    </li>
     {#each selects as select}
         <li class="flex flex-row items-center justify-between gap-3">
             <label for={select.id}>{select.label}</label>

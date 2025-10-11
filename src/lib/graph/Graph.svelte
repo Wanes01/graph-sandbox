@@ -26,6 +26,8 @@
 
             layout: { name: SETTINGS.ui.layout },
 
+            maxZoom: 3,
+
             style: [
                 {
                     selector: 'node',
