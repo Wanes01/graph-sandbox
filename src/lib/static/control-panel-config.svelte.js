@@ -31,12 +31,12 @@ export const appearanceData = [
     {
         id: "show-labels",
         type: "checkbox",
-        label: "Labels"
+        label: "Show labels"
     },
     {
         id: "show-weights",
         type: "checkbox",
-        label: "Weights"
+        label: "Show weights"
     },
     {
         id: "layout",

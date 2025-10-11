@@ -3,6 +3,7 @@
     import { appearanceData } from '$lib/static/control-panel-config.svelte';
     import { SETTINGS } from '$lib/static/graph-config.svelte';
     import CheckBox from '$lib/components/inputs/CheckBox.svelte';
+    import Select from '$lib/components/inputs/Select.svelte';
 
     /**
      * @param {string} type
@@ -12,7 +13,14 @@
     }
 
     const checkboxes = filterInput('checkbox');
-    const selects = filterInput('select');
+    let selects = filterInput('select');
+    selects.map((sel) => {
+        // @ts-ignore
+        const opts = [];
+        sel.options?.forEach((opt) => opts.push({ value: opt, label: opt }));
+        // @ts-ignore
+        sel.options = opts;
+    });
     const colors = filterInput('color');
 </script>
 
@@ -24,17 +32,11 @@
     </li>
     {#each selects as select}
         <li class="flex flex-row items-center justify-between gap-3">
-            <label for={select.id}>{select.label}</label>
-            <select
-                name={select.id}
-                id={select.id}
-                class="w-1/2 border border-black p-1 text-center"
+            <Select
                 bind:value={SETTINGS.ui[select.id]}
-            >
-                {#each select.options as option, i}
-                    <option value={option} selected={i === 0}>{option}</option>
-                {/each}
-            </select>
+                options={select.options}
+                label={select.label}
+            />
         </li>
     {/each}
     {#each colors as color}

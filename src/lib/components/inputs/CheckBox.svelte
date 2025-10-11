@@ -10,7 +10,7 @@
 
 <button
     onclick={toggle}
-    class="flex w-full flex-row overflow-hidden rounded-lg border-1 transition-all duration-200
+    class="flex w-full flex-row items-stretch overflow-hidden rounded-lg border-1 transition-all duration-200
     {disabled
         ? 'cursor-not-allowed border-slate-300 bg-slate-50 opacity-60'
         : checked
@@ -19,7 +19,7 @@
     {disabled}
 >
     <div
-        class="flex h-10 w-10 items-center justify-center transition-all duration-200
+        class="flex w-9 items-center justify-center transition-all duration-200
       {disabled ? 'bg-slate-200' : checked ? 'bg-blue-500' : 'bg-slate-100'}"
     >
         {#if checked}
@@ -32,6 +32,12 @@
         {/if}
     </div>
     <div class="flex flex-1 flex-row items-center px-3">
-        <p class="text-sm font-medium {disabled ? 'text-slate-400' : 'text-slate-700'}">{label}</p>
+        <p
+            class="py-1 text-left text-sm font-medium {disabled
+                ? 'text-slate-400'
+                : 'text-slate-700'}"
+        >
+            {label}
+        </p>
     </div>
 </button>
