@@ -37,10 +37,6 @@
             isOpen = false;
         }
     }
-
-    $effect(() => {
-        console.log(isOpen, disabled);
-    });
 </script>
 
 <svelte:window onclick={handleClickOutside} />
