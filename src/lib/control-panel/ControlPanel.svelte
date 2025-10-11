@@ -10,30 +10,40 @@
 </script>
 
 <aside
-    class="relative mr-2 h-[98vh] rounded border-1 border-slate-400 bg-white px-4 py-2 shadow transition-all duration-300"
+    class="relative mr-2 h-[98vh] rounded-lg border-1 border-slate-300 bg-white shadow-lg transition-all duration-300"
     style="width: {width}"
 >
+    <!-- Always visible tag to open / close the drawer -->
     <button
         onclick={toggleBox}
-        class="absolute bottom-0 left-0 {!open
-            ? ''
-            : '-translate-x-2/3'} cursor-pointer rounded-md rounded-r-none {open
-            ? 'border'
-            : ''} border-r-0 border-slate-400 bg-white"
+        aria-label="Open / close settings drawer"
+        class="absolute top-1/2 left-0 flex h-24 w-7 -translate-x-full -translate-y-1/2 items-center justify-center rounded-l-lg border-1 border-r-0 border-slate-300 bg-white transition-all duration-200 hover:border-blue-400 hover:bg-blue-50"
     >
-        <img
-            src="/icons/{open ? 'arrow-left' : 'arrow-right'}.svg"
-            alt="Open / close control panel"
-            class="h-8 w-7"
-        />
+        <svg
+            class="h-5 w-5 text-slate-600 transition-transform duration-200"
+            class:rotate-180={open}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+            />
+        </svg>
     </button>
-    <div
-        class="flex flex-col gap-3 transition-opacity duration-300"
-        style="opacity: {open ? '1' : '0'}; pointer-events: {open ? 'auto' : 'none'}"
-    >
-        {#if open}
-            <QuickEdit />
-            <Appearance />
-        {/if}
+
+    <div class="px-4 py-2">
+        <div
+            class="flex flex-col gap-3 transition-opacity duration-300"
+            style="opacity: {open ? '1' : '0'}; pointer-events: {open ? 'auto' : 'none'}"
+        >
+            {#if open}
+                <QuickEdit />
+                <Appearance />
+            {/if}
+        </div>
     </div>
 </aside>
