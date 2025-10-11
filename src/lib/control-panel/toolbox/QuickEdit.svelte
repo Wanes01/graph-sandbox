@@ -1,6 +1,6 @@
 <script>
     import ToolBox from '$lib/components/ToolBox.svelte';
-    import QuickButton from '$lib/components/QuickButton.svelte';
+    import QuickButton from '$lib/components/inputs/QuickButton.svelte';
     import { quickEditData } from '$lib/static/control-panel-config.svelte';
     import { cy } from '$lib/static/graph-config.svelte';
 
@@ -11,7 +11,7 @@
     <li class="flex w-full flex-col gap-2">
         <div class="flex w-full flex-row gap-2">
             {#each quickEditData as quickButton}
-                <li class="w-1/{quickEditData.length}">
+                <li class="flex-1">
                     <QuickButton {...quickButton} />
                 </li>
             {/each}

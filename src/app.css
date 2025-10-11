@@ -1,1 +1,7 @@
 @import 'tailwindcss';
+
+/* DO NOT REMOVE the last comma. It is needed to generate bg- variants without modifiers */
+@source inline("{hover:,active:,}bg-{red,green,yellow,cyan,blue,sky,indigo,purple,rose,gray,stone}-{200,300}");
+@source inline("border-{red,green,yellow,cyan,blue,sky,indigo,purple,rose,gray,stone}-{800,900}");
+@source inline("text-{red,green,yellow,cyan,blue,sky,indigo,purple,rose,gray,stone}-900");
+@source inline("{active:}inset-shadow-{red,green,yellow,cyan,blue,sky,indigo,purple,rose,gray,stone}-800");
