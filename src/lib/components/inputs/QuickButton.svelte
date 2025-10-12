@@ -8,7 +8,7 @@
     const baseStyle = 'w-full flex flex-row justify-center py-2 px-4 rounded cursor-pointer ';
     const disabledStyle =
         'bg-blue-200 hover:bg-blue-300 border-b-3 border-blue-500 hover:border-blue-500';
-    const enabledStyle = 'inset-shadow-sm inset-shadow-blue-600 bg-blue-100';
+    const enabledStyle = 'inset-shadow-sm inset-shadow-blue-600 bg-blue-100 pt-[10px] pb-[8px]';
 
     function onclick() {
         if (SETTINGS.editMode === editMode) {

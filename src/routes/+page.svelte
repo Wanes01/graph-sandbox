@@ -1,7 +1,6 @@
 <script>
     import Graph from '$lib/graph/Graph.svelte';
     import ControlPanel from '$lib/control-panel/ControlPanel.svelte';
-    import ChoiceModal from '$lib/components/modals/ChoiceModal.svelte';
 
     let ctrlPanelOpen = $state(true);
     let ctrlPanelWidth = $derived(ctrlPanelOpen ? 20 : 1);
