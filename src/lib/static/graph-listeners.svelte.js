@@ -54,62 +54,95 @@ export function initializeGraphListeners() {
     });
 
     /**
-     * Adds an edge / double edge
-     */
+ * Handles adding an edge (uni- or bi-directional) depending on the edit mode.
+ */
     cy?.on('tap', 'node', function (e) {
-        if (SETTINGS.editMode !== EDIT_MODES.ADD_EDGE
-            && SETTINGS.editMode !== EDIT_MODES.ADD_DOUBLE_EDGE
-        ) {
+        const mode = SETTINGS.editMode;
+
+        // Gestisci solo se siamo in modalità di aggiunta arco
+        // @ts-ignore
+        if (![EDIT_MODES.ADD_EDGE, EDIT_MODES.ADD_DOUBLE_EDGE].includes(mode)) {
             return;
         }
 
-        // selectes the first node to link
+        // Changes the style of the first node to link
         if (!SETTINGS.selectedNode) {
             SETTINGS.selectedNode = e.target;
             SETTINGS.selectedNode?.data('status', 'begin-link');
             return;
         }
 
-        /**
-         * Adds an edge from node src to dst.
-         * @param {import('cytoscape').NodeSingular} src 
-         * @param {import('cytoscape').NodeSingular} dst 
-         */
-        function addEdge(src, dst) {
-            GRAPH_DATA.edges++;
+        // User clicked two nodes. Creates the edge.
+        const src = SETTINGS.selectedNode;
+        const dst = e.target;
+        const edgeCount = ++GRAPH_DATA.edges;
+
+        // Resets the first node style
+        SETTINGS.selectedNode.data('status', 'normal');
+        SETTINGS.selectedNode = null;
+
+        // Creates a unidirectional edge
+        if (mode === EDIT_MODES.ADD_EDGE) {
             cy?.add({
                 group: 'edges',
                 data: {
-                    // id format: srcId-dstId#edgeNumber
-                    id: `${src.id()}-${dst.id()}#${GRAPH_DATA.edges}`,
+                    id: `${src.id()}-${dst.id()}#${edgeCount}`,
                     source: src.id(),
                     target: dst.id(),
                     weight: 0,
-                    symbolicWeight: "0"
+                    symbolicWeight: "0",
+                    type: 'unidir'
                 }
             });
+
+            // Creates two edges to emulate a bidirectional edge
+        } else if (mode === EDIT_MODES.ADD_DOUBLE_EDGE) {
+            const id1 = `${src.id()}-${dst.id()}#${edgeCount}`;
+            const id2 = `${dst.id()}-${src.id()}#${edgeCount}`;
+
+            cy?.add([
+                {
+                    group: 'edges',
+                    data: {
+                        id: id1,
+                        pairId: id2,
+                        source: src.id(),
+                        target: dst.id(),
+                        weight: 0,
+                        symbolicWeight: "0",
+                        type: 'bidir'
+                    }
+                },
+                {
+                    group: 'edges',
+                    data: {
+                        id: id2,
+                        pairId: id1,
+                        source: dst.id(),
+                        target: src.id(),
+                        weight: 0,
+                        symbolicWeight: "0",
+                        type: 'hidden'
+                    }
+                }
+            ]);
         }
-
-        const src = SETTINGS.selectedNode;
-        const dst = e.target;
-
-        addEdge(src, dst);
-        // adds the second arc to make the connection bidirectional
-        if (SETTINGS.editMode === EDIT_MODES.ADD_DOUBLE_EDGE) {
-            addEdge(dst, src);
-        }
-
-        SETTINGS.selectedNode.data('status', 'normal');
-        SETTINGS.selectedNode = null;
         historyManager?.save();
     });
+
 
     /**
      * Deletes a node / an edge
      */
     cy?.on('tap', 'node, edge', function (e) {
         if (SETTINGS.editMode === EDIT_MODES.ERASER) {
-            e.target.remove();
+            const elem = e.target;
+            // Deletes the hidden edge if its a bidirectional edge
+            if (elem.isEdge && elem.isEdge() && elem.data('pairId')) {
+                const hiddenEdge = cy?.getElementById(elem.data('pairId'));
+                hiddenEdge?.remove();
+            }
+            elem.remove();
             historyManager?.save();
         }
     });

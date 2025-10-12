@@ -35,6 +35,7 @@
                         backgroundColor: SETTINGS.ui['vertex-color']
                     }
                 },
+                // nodes that have a label to show
                 {
                     selector: 'node[label]',
                     style: {
@@ -47,6 +48,7 @@
                         'text-opacity': 1
                     }
                 },
+                // node clicked to create an edge
                 {
                     selector: 'node[status = "begin-link"]',
                     style: {
@@ -54,22 +56,49 @@
                         'text-outline-color': '#eb7d34'
                     }
                 },
+
                 {
                     selector: 'edge',
                     style: {
                         width: 2,
                         'line-color': SETTINGS.ui['edge-color'],
                         'target-arrow-color': SETTINGS.ui['edge-color'],
-                        'target-arrow-shape': 'triangle',
+                        'target-arrow-shape': SETTINGS.ui['arrow-shape'],
                         'arrow-scale': 1.8,
                         'curve-style': 'bezier',
                         'font-size': 16
                     }
                 },
+                // edges with infinity weights
                 {
                     selector: 'edge[symbolicWeight = "∞"], edge[symbolicWeight = "-∞"]',
                     style: {
                         'font-size': 30
+                    }
+                },
+                // unidirectional edges
+                {
+                    selector: 'edge[type="unidir"]',
+                    style: {}
+                },
+                /* bidirectional edges. When a bidirectional edge is created,
+                    two edges are created: a bidir and a hidden one.
+                    Only the bidir arc is shown. The two arcs must be referenced
+                    to each other via a field in edge.data(...).
+                    This is done because only unidirectional arcs can be represented
+                    in cytoscape.js 
+                */
+                {
+                    selector: 'edge[type="bidir"]',
+                    style: {
+                        'source-arrow-shape': SETTINGS.ui['arrow-shape'],
+                        'source-arrow-color': SETTINGS.ui['edge-color']
+                    }
+                },
+                {
+                    selector: 'edge[type="hidden"]',
+                    style: {
+                        display: 'none'
                     }
                 }
             ]

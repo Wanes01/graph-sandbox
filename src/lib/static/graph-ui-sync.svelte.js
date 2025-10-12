@@ -96,6 +96,8 @@ export function initUISync() {
         cy?.style().selector('edge').style({
             'line-color': SETTINGS.ui['edge-color'],
             'target-arrow-color': SETTINGS.ui['edge-color']
+        }).selector('edge[type="bidir"]').style({
+            'source-arrow-color': SETTINGS.ui['edge-color']
         }).update();
     });
 
@@ -105,6 +107,8 @@ export function initUISync() {
     $effect(() => {
         cy?.style().selector('edge').style({
             'target-arrow-shape': SETTINGS.ui['arrow-shape']
+        }).selector('edge[type="bidir"]').style({
+            'source-arrow-shape': SETTINGS.ui['arrow-shape']
         }).update();
     })
 }
