@@ -2,7 +2,9 @@ import { GraphHistoryManager } from "$lib/static/graph-history.svelte";
 import dagre from "cytoscape-dagre";
 import cytoscape from "cytoscape";
 
+// dagre layout for cytoscape js
 cytoscape.use(dagre);
+
 /**
  * Mimics an enum for the quick edit mode types.
  */
@@ -258,5 +260,5 @@ const INIT_GRAPH_DATA = {
         display: 'none'
       }
     }
-  ]
+  ],
 };
