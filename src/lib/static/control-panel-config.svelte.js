@@ -42,7 +42,7 @@ export const appearanceData = [
         id: "layout",
         type: "select",
         label: "Layout",
-        options: LAYOUTS
+        options: LAYOUTS.map(layout => layout.name)
     },
     {
         id: "arrow-shape",

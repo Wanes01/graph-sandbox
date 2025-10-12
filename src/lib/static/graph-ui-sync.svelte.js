@@ -1,11 +1,13 @@
-import { SETTINGS, cy } from "./graph-config.svelte";
+import { LAYOUTS, SETTINGS, cy } from "./graph-config.svelte";
 
 export function initUISync() {
     /**
      * Changes layout on user input.
      */
     $effect(() => {
-        cy?.layout({ name: SETTINGS.ui['layout'] }).run();
+        const layoutObj = LAYOUTS.find(l => l.name === SETTINGS.ui['layout']);
+        // @ts-ignore
+        cy?.layout(layoutObj).run();
     });
 
     /**
