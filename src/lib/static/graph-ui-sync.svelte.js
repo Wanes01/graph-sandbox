@@ -113,4 +113,13 @@ export function initUISync() {
             'source-arrow-shape': SETTINGS.ui['arrow-shape']
         }).update();
     })
+
+    /**
+     * Changes curve style of edges.
+     */
+    $effect(() => {
+        cy?.style().selector('edge').style({
+            'curve-style': SETTINGS.ui['curve-style']
+        }).update();
+    });
 }

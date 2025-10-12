@@ -29,8 +29,14 @@ export const SETTINGS = $state({
     'vertex-color': '#007bff',
     'edge-color': '#ccc',
     'show-labels': true,
-    'show-weights': false
+    'show-weights': false,
+    'curve-style': 'bezier'
   }
+});
+
+export const GRAPH_DATA = $state({
+  nodes: 0,
+  edges: 0
 });
 
 /**
@@ -92,8 +98,20 @@ export const LAYOUTS = [
 // @ts-ignore
 LAYOUTS.forEach(layout => layout['fit'] = true);
 
-console.log(LAYOUTS);
-
+/**
+ * Available styles for edges curves
+ */
+export const CURVE_STYLES = [
+  'bezier',
+  'haystack',
+  'straight',
+  'unbundled-bezier',
+  'segments',
+  'taxi',
+  'straight-triangle',
+  'round-segments',
+  'round-taxi'
+];
 
 /**
  * Available arrow shapes
@@ -109,11 +127,6 @@ export const ARROW_SHAPES = [
   "diamond",
   "chevron"
 ];
-
-export const GRAPH_DATA = $state({
-  nodes: 0,
-  edges: 0
-});
 
 /**
  * Weidght associated with edges which
@@ -209,7 +222,7 @@ const INIT_GRAPH_DATA = {
         'target-arrow-color': SETTINGS.ui['edge-color'],
         'target-arrow-shape': SETTINGS.ui['arrow-shape'],
         'arrow-scale': 1.8,
-        'curve-style': 'bezier',
+        'curve-style': SETTINGS.ui['curve-style'],
         'font-size': 16
       }
     },

@@ -1,5 +1,5 @@
 <script>
-    // executes code only after the graph element is mount on the DOM
+    // executes code only after the graph element is mounted on the DOM
     import { onMount } from 'svelte';
     import { initializeGraph } from '$lib/static/graph-config.svelte';
     import { initializeGraphListeners } from '$lib/static/graph-listeners.svelte';

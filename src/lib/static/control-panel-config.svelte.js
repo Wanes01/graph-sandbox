@@ -1,4 +1,4 @@
-import { EDIT_MODES, LAYOUTS, SETTINGS, ARROW_SHAPES } from "./graph-config.svelte";
+import { EDIT_MODES, LAYOUTS, SETTINGS, ARROW_SHAPES, CURVE_STYLES } from "./graph-config.svelte";
 
 export const quickEditData = [
     {
@@ -49,6 +49,12 @@ export const appearanceData = [
         type: "select",
         label: "Arrow shape",
         options: ARROW_SHAPES
+    },
+    {
+        id: "curve-style",
+        type: "select",
+        label: "Curve style",
+        options: CURVE_STYLES
     },
     {
         id: "vertex-color",
