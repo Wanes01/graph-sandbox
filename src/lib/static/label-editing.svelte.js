@@ -13,7 +13,7 @@ export function editElementLabel(element, isNode) {
         ? element.data('label') || ''
         : element.data('symbolicWeight');
 
-    input.className = "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 w-[300px] text-center bg-blue-100";
+    input.className = "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 w-[300px] text-center bg-white rounded-lg outline-none border border-slate-700 shadow-lg";
     input.style.zIndex = (1000).toString();
 
     cyDOM?.appendChild(input);

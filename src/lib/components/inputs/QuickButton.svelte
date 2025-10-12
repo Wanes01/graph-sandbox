@@ -2,7 +2,6 @@
     import { SETTINGS } from '$lib/static/graph-config.svelte';
 
     const { id, alt, icon, editMode } = $props();
-    // dato derivato => cambia sempre quando cambia SETTINGS.editMode
     let pressed = $derived(SETTINGS.editMode === editMode);
 
     const baseStyle = 'w-full flex flex-row justify-center py-2 px-4 rounded cursor-pointer ';
