@@ -11,7 +11,7 @@
 </script>
 
 <aside
-    class="relative mr-2 h-[98vh] rounded-lg border-1 border-slate-300 bg-white shadow-lg transition-all duration-300"
+    class="relative mr-2 h-[98vh] overflow-y-scroll rounded-lg border-1 border-slate-300 bg-white shadow-lg transition-all duration-300"
     style="width: {width}"
 >
     <!-- Always visible tag to open / close the drawer -->

@@ -41,31 +41,50 @@
 
         const newValue = event.target.value;
 
+        // Permetti valori vuoti o solo il segno meno durante la digitazione
         if (newValue === '' || newValue === '-') {
             value = newValue;
             return;
         }
 
-        const numValue = parseFloat(newValue);
         const isIntegerStep = Number.isInteger(step);
 
-        if (!isNaN(numValue)) {
-            let finalValue = numValue;
+        // Se step è intero, blocca l'inserimento di decimali
+        if (isIntegerStep && (newValue.includes('.') || newValue.includes(','))) {
+            value = parseFloat(newValue) || value;
+            return;
+        }
 
-            // Se step è intero, arrotonda il valore
-            if (isIntegerStep) {
-                finalValue = Math.round(numValue);
-            } else {
-                finalValue = roundToStep(numValue);
-            }
+        // Permetti punto/virgola finale durante la digitazione di decimali
+        if (!isIntegerStep && (newValue.endsWith('.') || newValue.endsWith(','))) {
+            value = newValue;
+            return;
+        }
 
-            if (min !== undefined && finalValue < min) {
-                value = min;
-            } else if (max !== undefined && finalValue > max) {
-                value = max;
-            } else {
-                value = finalValue;
-            }
+        const numValue = parseFloat(newValue);
+
+        // Se non è un numero valido, mantieni l'input vuoto
+        if (isNaN(numValue)) {
+            value = '';
+            return;
+        }
+
+        let finalValue = numValue;
+
+        // Se step è intero, arrotonda il valore
+        if (isIntegerStep) {
+            finalValue = Math.round(numValue);
+        } else {
+            finalValue = roundToStep(numValue);
+        }
+
+        // Applica i limiti, ma non forzare il min durante la digitazione
+        if (max !== undefined && finalValue > max) {
+            value = max;
+        } else if (min !== undefined && finalValue < min && !isFocused) {
+            value = min;
+        } else {
+            value = finalValue;
         }
     }
 

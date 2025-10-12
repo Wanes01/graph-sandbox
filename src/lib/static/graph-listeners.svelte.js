@@ -76,7 +76,7 @@ export function initializeGraphListeners() {
         const src = SETTINGS.selectedNode;
         const dst = e.target;
 
-        generateEdge(src, dst, SETTINGS.editMode === EDIT_MODES.ADD_DOUBLE_EDGE);
+        generateEdge(src.id(), dst.id(), SETTINGS.editMode === EDIT_MODES.ADD_DOUBLE_EDGE);
 
         // Resets the first node style
         SETTINGS.selectedNode.data('status', 'normal');

@@ -4,9 +4,12 @@
     import NumberInput from '$lib/components/inputs/NumberInput.svelte';
     import Select from '$lib/components/inputs/Select.svelte';
     import CheckBox from '$lib/components/inputs/CheckBox.svelte';
-    import { generateVertices } from '$lib/static/graph-generate.svelte';
     import { edgeGenerationData } from '$lib/static/control-panel-config.svelte';
-    import { edgeGenerationMethods } from '$lib/static/graph-generate.svelte';
+    import {
+        EDGE_GENERATION_METHODS,
+        applyEdgeGen,
+        generateVertices
+    } from '$lib/static/graph-generate.svelte';
 
     /**
      * @type {number | null}
@@ -28,19 +31,33 @@
         };
     });
 
-    const edgeGenerationOptions = edgeGenerationMethods.map((method) => {
+    const edgeGenerationOptions = Object.entries(EDGE_GENERATION_METHODS).map(([genType, data]) => {
         return {
-            label: method.label,
-            value: method.label
+            label: data.label,
+            value: genType
         };
     });
 
-    let edgeGenerationMethod = $state(null);
+    let selectedEdgeMethod = $state(null);
 
     /**
      * @type {boolean}
      */
     let selfLoops = $state(false);
+
+    /**
+     * @type {number}
+     */
+    let probability = $state(0.01);
+
+    /**
+     * @type {any}
+     */
+    const edgeFunctionInput = $derived({
+        edgeType: edgeType,
+        selfLoops: selfLoops,
+        p: probability
+    });
 </script>
 
 <ToolBox legend="Generate graph" direction="col" openOnMount={true}>
@@ -72,12 +89,24 @@
     <Select
         label={'Edge generation method'}
         options={edgeGenerationOptions}
-        bind:value={edgeGenerationMethod}
+        bind:value={selectedEdgeMethod}
     />
+    {#if selectedEdgeMethod === EDGE_GENERATION_METHODS.PROBABILITY.id}
+        <NumberInput label="Probability" min={0.01} max={1} step={0.01} bind:value={probability} />
+    {/if}
     <div class="my-1">
         <CheckBox label={'Allow self-loops'} bind:checked={selfLoops} />
     </div>
-    <Button color="blue" onclick={() => {}}>
+    <Button
+        color="blue"
+        onclick={() => {
+            if (selectedEdgeMethod && edgeType) {
+                // @ts-ignore
+                const fn = EDGE_GENERATION_METHODS[selectedEdgeMethod].fn;
+                applyEdgeGen(fn, edgeFunctionInput);
+            }
+        }}
+    >
         <span>Generate edges</span>
     </Button>
 </ToolBox>

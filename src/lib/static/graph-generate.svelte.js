@@ -1,15 +1,34 @@
-import { GRAPH_DATA, cy, historyManager } from "./graph-config.svelte"
+import { EDGE_TYPES, GRAPH_DATA, cy, historyManager } from "./graph-config.svelte"
 
-export const edgeGenerationMethods = [
-    {
+export const EDGE_GENERATION_METHODS = {
+    PROBABILITY: {
         label: 'Probability',
-        function: null
+        fn: generateEdgeByProbability,
+        id: 'PROBABILITY',
     },
-    {
+    NCOUPLES: {
         label: 'N random couples',
-        function: null
+        fn: testing,
+        id: 'NCOUPLES'
     }
-]
+}
+
+/**
+ * 
+ * @param {Function} fn 
+ * @param {any} inp 
+ */
+export function applyEdgeGen(fn, inp) {
+    fn(inp);
+    historyManager?.save();
+}
+
+/**
+ * @param {any} input
+ */
+function testing(input) {
+    console.log(input);
+}
 
 /**
  * @param {number} vertNum
@@ -32,11 +51,11 @@ export function generateVertices(vertNum, giveLabel) {
 
 /**
  * 
- * @param {import("cytoscape").NodeSingular} src 
- * @param {import("cytoscape").NodeSingular} dst 
+ * @param {string} srcId
+ * @param {string} dstId 
  * @param {boolean} bidir 
  */
-export function generateEdge(src, dst, bidir) {
+export function generateEdge(srcId, dstId, bidir) {
     const edgeCount = ++GRAPH_DATA.edges;
 
     // Creates a unidirectional edge
@@ -44,9 +63,9 @@ export function generateEdge(src, dst, bidir) {
         cy?.add({
             group: 'edges',
             data: {
-                id: `${src.id()}-${dst.id()}#${edgeCount}`,
-                source: src.id(),
-                target: dst.id(),
+                id: `${srcId}-${dstId}#${edgeCount}`,
+                source: srcId,
+                target: dstId,
                 weight: 0,
                 symbolicWeight: "0",
                 type: 'unidir'
@@ -55,8 +74,8 @@ export function generateEdge(src, dst, bidir) {
 
         // Creates two edges to emulate a bidirectional edge
     } else {
-        const id1 = `${src.id()}-${dst.id()}#${edgeCount}`;
-        const id2 = `${dst.id()}-${src.id()}#${edgeCount}`;
+        const id1 = `${srcId}-${dstId}#${edgeCount}`;
+        const id2 = `${dstId}-${srcId}#${edgeCount}`;
 
         cy?.add([
             {
@@ -64,8 +83,8 @@ export function generateEdge(src, dst, bidir) {
                 data: {
                     id: id1,
                     pairId: id2,
-                    source: src.id(),
-                    target: dst.id(),
+                    source: srcId,
+                    target: dstId,
                     weight: 0,
                     symbolicWeight: "0",
                     type: 'bidir'
@@ -76,8 +95,8 @@ export function generateEdge(src, dst, bidir) {
                 data: {
                     id: id2,
                     pairId: id1,
-                    source: dst.id(),
-                    target: src.id(),
+                    source: dstId,
+                    target: srcId,
                     weight: 0,
                     symbolicWeight: "0",
                     type: 'hidden'
@@ -89,16 +108,45 @@ export function generateEdge(src, dst, bidir) {
 
 /**
  * 
- * @param {number} p 0 < prob <= 1
+ * @param {any} input
  */
-export function generateEdgeByProbability(p) {
+export function generateEdgeByProbability(input) {
+    const [p, selfLoops, edgeType] = [input.p, input.selfLoops, input.edgeType];
+
+    if (p <= 0 || p > 1) {
+        return;
+    }
+
     const ids = cy?.nodes().map(node => node.id());
 
     if (!ids) {
         return;
     }
 
-    for (let i = 0; i < ids?.length; i++) {
+    for (let i = 0; i < ids.length; i++) {
+        for (let j = i; j < ids.length; j++) {
+            if (!selfLoops && i == j) {
+                continue;
+            }
+            const guess = Math.random() * (1 - 0.01 + Number.EPSILON) + 0.01;
+            if (guess > p) {
+                continue;
+            }
+            // creates the edge with probability p
+            const srcId = ids[i];
+            const dstId = ids[j];
 
+            generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType))
+        }
     }
+}
+
+/**
+ * @param {symbol} edgeType
+ */
+function edgeTypeToBoolean(edgeType) {
+    if (edgeType === EDGE_TYPES.MIXED) {
+        return Math.random() < 0.5;
+    }
+    return edgeType === EDGE_TYPES.UNDIRECTED;
 }

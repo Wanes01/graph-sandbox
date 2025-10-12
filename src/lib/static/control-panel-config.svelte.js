@@ -72,12 +72,12 @@ export const appearanceData = [
 
 export const edgeGenerationData = [
     {
-        label: "Directed",
-        type: EDGE_TYPES.DIRECTED
-    },
-    {
         label: "Undirected",
         type: EDGE_TYPES.UNDIRECTED
+    },
+    {
+        label: "Directed",
+        type: EDGE_TYPES.DIRECTED
     },
     {
         label: "Mixed",

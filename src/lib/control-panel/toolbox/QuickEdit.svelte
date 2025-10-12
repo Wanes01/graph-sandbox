@@ -4,7 +4,7 @@
     import QuickButton from '$lib/components/inputs/QuickButton.svelte';
     import ChoiceModal from '$lib/components/modals/ChoiceModal.svelte';
     import { quickEditData } from '$lib/static/control-panel-config.svelte';
-    import { cy } from '$lib/static/graph-config.svelte';
+    import { cy, historyManager } from '$lib/static/graph-config.svelte';
 
     let showDeleteModal = $state(false);
 </script>
@@ -31,6 +31,7 @@
         leftText="Yes"
         leftOnClick={() => {
             cy?.remove('*');
+            historyManager?.save();
             showDeleteModal = false;
         }}
         rightColor="red"
