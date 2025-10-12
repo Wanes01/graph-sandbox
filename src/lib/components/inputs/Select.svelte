@@ -108,7 +108,7 @@
                             ? 'bg-blue-50 font-medium text-blue-700'
                             : 'text-slate-700 hover:bg-slate-50'}"
                     >
-                        <span class="mr-2 w-4">{option.label}</span>
+                        <span class="mr-2 w-full">{option.label}</span>
                     </button>
                 {/each}
             </div>

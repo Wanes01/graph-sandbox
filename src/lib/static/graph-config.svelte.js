@@ -16,6 +16,15 @@ export const EDIT_MODES = Object.freeze({
 });
 
 /**
+ * The types of edges as an enum.
+ */
+export const EDGE_TYPES = Object.freeze({
+  DIRECTED: Symbol('DIRECTED'),
+  UNDIRECTED: Symbol('UNDIRECTED'),
+  MIXED: Symbol('MIXED')
+});
+
+/**
  * General graph settings
  */
 export const SETTINGS = $state({

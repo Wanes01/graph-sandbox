@@ -1,4 +1,4 @@
-import { EDIT_MODES, LAYOUTS, SETTINGS, ARROW_SHAPES, CURVE_STYLES } from "./graph-config.svelte";
+import { EDIT_MODES, LAYOUTS, SETTINGS, ARROW_SHAPES, CURVE_STYLES, EDGE_TYPES } from "./graph-config.svelte";
 
 export const quickEditData = [
     {
@@ -67,5 +67,20 @@ export const appearanceData = [
         type: "color",
         label: "Edge color",
         default: SETTINGS.ui["edge-color"]
+    }
+];
+
+export const edgeGenerationData = [
+    {
+        label: "Directed",
+        type: EDGE_TYPES.DIRECTED
+    },
+    {
+        label: "Undirected",
+        type: EDGE_TYPES.UNDIRECTED
+    },
+    {
+        label: "Mixed",
+        type: EDGE_TYPES.MIXED
     }
 ];

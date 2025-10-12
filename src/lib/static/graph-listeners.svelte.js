@@ -1,4 +1,5 @@
 import { EDIT_MODES, SETTINGS, GRAPH_DATA, historyManager, cy } from '$lib/static/graph-config.svelte';
+import { generateEdge } from './graph-generate.svelte';
 import { editElementLabel } from './label-editing.svelte';
 
 export function initializeGraphListeners() {
@@ -59,7 +60,6 @@ export function initializeGraphListeners() {
     cy?.on('tap', 'node', function (e) {
         const mode = SETTINGS.editMode;
 
-        // Gestisci solo se siamo in modalità di aggiunta arco
         // @ts-ignore
         if (![EDIT_MODES.ADD_EDGE, EDIT_MODES.ADD_DOUBLE_EDGE].includes(mode)) {
             return;
@@ -75,58 +75,12 @@ export function initializeGraphListeners() {
         // User clicked two nodes. Creates the edge.
         const src = SETTINGS.selectedNode;
         const dst = e.target;
-        const edgeCount = ++GRAPH_DATA.edges;
+
+        generateEdge(src, dst, SETTINGS.editMode === EDIT_MODES.ADD_DOUBLE_EDGE);
 
         // Resets the first node style
         SETTINGS.selectedNode.data('status', 'normal');
         SETTINGS.selectedNode = null;
-
-        // Creates a unidirectional edge
-        if (mode === EDIT_MODES.ADD_EDGE) {
-            cy?.add({
-                group: 'edges',
-                data: {
-                    id: `${src.id()}-${dst.id()}#${edgeCount}`,
-                    source: src.id(),
-                    target: dst.id(),
-                    weight: 0,
-                    symbolicWeight: "0",
-                    type: 'unidir'
-                }
-            });
-
-            // Creates two edges to emulate a bidirectional edge
-        } else if (mode === EDIT_MODES.ADD_DOUBLE_EDGE) {
-            const id1 = `${src.id()}-${dst.id()}#${edgeCount}`;
-            const id2 = `${dst.id()}-${src.id()}#${edgeCount}`;
-
-            cy?.add([
-                {
-                    group: 'edges',
-                    data: {
-                        id: id1,
-                        pairId: id2,
-                        source: src.id(),
-                        target: dst.id(),
-                        weight: 0,
-                        symbolicWeight: "0",
-                        type: 'bidir'
-                    }
-                },
-                {
-                    group: 'edges',
-                    data: {
-                        id: id2,
-                        pairId: id1,
-                        source: dst.id(),
-                        target: src.id(),
-                        weight: 0,
-                        symbolicWeight: "0",
-                        type: 'hidden'
-                    }
-                }
-            ]);
-        }
         historyManager?.save();
     });
 

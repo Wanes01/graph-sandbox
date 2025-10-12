@@ -10,7 +10,7 @@
 
 <button
     onclick={toggle}
-    class="flex w-full flex-row items-stretch overflow-hidden rounded-lg border-1 transition-all duration-200
+    class="flex min-h-9 w-full flex-row items-stretch overflow-hidden rounded-lg border-1 transition-all duration-200
     {disabled
         ? 'cursor-not-allowed border-slate-300 bg-slate-50 opacity-60'
         : checked
