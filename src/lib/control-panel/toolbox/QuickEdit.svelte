@@ -9,7 +9,7 @@
     let showDeleteModal = $state(false);
 </script>
 
-<ToolBox legend="Quick edit" direction="row">
+<ToolBox legend="Quick edit" direction="row" openOnMount={true}>
     <li class="flex w-full flex-col gap-2">
         <div class="flex w-full flex-row gap-2">
             {#each quickEditData as quickButton}

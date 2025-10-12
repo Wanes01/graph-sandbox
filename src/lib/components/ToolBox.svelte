@@ -1,8 +1,8 @@
 <script>
     import { slide } from 'svelte/transition';
 
-    const { children, legend, direction } = $props();
-    let open = $state(true);
+    const { children, legend, direction, openOnMount = false } = $props();
+    let open = $state(openOnMount);
 
     function toggleBox() {
         open = !open;
