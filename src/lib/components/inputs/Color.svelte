@@ -46,11 +46,7 @@
     }
 </script>
 
-<svelte:window
-    onclick={handleClickOutside}
-    onscroll={updatePickerPosition}
-    onresize={updatePickerPosition}
-/>
+<svelte:window onclick={handleClickOutside} />
 
 <div bind:this={htmlElement} class="color-container relative w-full">
     {#if label}
