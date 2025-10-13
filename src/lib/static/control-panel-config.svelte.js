@@ -67,7 +67,7 @@ export const appearanceData = [
         type: "color",
         label: "Edge color",
         default: SETTINGS.ui["edge-color"]
-    }
+    },
 ];
 
 export const edgeGenerationData = [
@@ -84,3 +84,30 @@ export const edgeGenerationData = [
         type: EDGE_TYPES.MIXED
     }
 ];
+
+export const performanceData = [
+        {
+        id: "disable-animation",
+        type: "checkbox",
+        label: "Disable graph animations",
+        perf: true
+    },
+    {
+        id: "hide-edges-on-viewport",
+        type: "checkbox",
+        label: "Hide edges when interacting with the graph",
+        perf: true
+    },
+    {
+        id: "texture-on-viewport",
+        type: "checkbox",
+        label: "Use a texture during panning and zooming",
+        perf: true
+    },
+    {
+        id: "motion-blur",
+        type: "checkbox",
+        label: "Use a motion blur effect between frames",
+        perf: true
+    }
+]

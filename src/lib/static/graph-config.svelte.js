@@ -41,7 +41,11 @@ export const SETTINGS = $state({
     'edge-color': '#ccc',
     'show-labels': true,
     'show-weights': false,
-    'curve-style': 'bezier'
+    'curve-style': 'bezier',
+    'disable-animation': false,
+    'hide-edges-on-viewport': false,
+    'texture-on-viewport': false,
+    'motion-blur': false
   },
   maxNodes: 1000,
 });
@@ -116,7 +120,7 @@ export const LAYOUTS = [
 LAYOUTS.forEach(layout => {
   layout['fit'] = true;
   // @ts-ignore
-  layout['animate'] = true;
+  layout['animate'] = !SETTINGS['disable-animation'];
 });
 
 /**
@@ -204,6 +208,17 @@ const INIT_GRAPH_DATA = {
 
   layout: { name: SETTINGS.ui.layout },
 
+  renderer: { name: 'canvas' },
+
+  // Disabilita texture durante le interazioni
+  textureOnViewport: false,
+  
+  // Abilita rendering con meno dettagli durante pan/zoom
+  motionBlur: true,
+  
+  // Nascondi elementi durante le interazioni
+  hideEdgesOnViewport: true,
+  
   maxZoom: 3,
 
   style: [

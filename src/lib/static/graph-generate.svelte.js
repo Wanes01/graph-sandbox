@@ -42,17 +42,23 @@ function testing(input) {
  */
 export function generateVertices(vertNum, giveLabel) {
     cy?.remove('node');
-    for (let i = 0; i < vertNum; i++) {
-        const id = cy?.nodes().length.toString();
-        cy?.add({
-            group: 'nodes',
-            data: {
-                id: id,
-                status: 'normal',
-                label: giveLabel ? `V#${id}` : ''
-            }
-        });
-    }
+    /**
+     * Batch operation to improve performances:
+     * doesn't trigger update() after every node insertion.
+     */
+    cy?.batch(() => {
+        for (let i = 0; i < vertNum; i++) {
+            const id = cy?.nodes().length.toString();
+            cy?.add({
+                group: 'nodes',
+                data: {
+                    id: id,
+                    status: 'normal',
+                    label: giveLabel ? `V#${id}` : ''
+                }
+            });
+        }
+    })
     historyManager?.save();
 }
 
@@ -60,14 +66,17 @@ export function generateVertices(vertNum, giveLabel) {
  * 
  * @param {string} srcId
  * @param {string} dstId 
- * @param {boolean} bidir 
+ * @param {boolean} bidir
+ * 
+ * @returns a list on objects representing the edges to add
  */
 export function generateEdge(srcId, dstId, bidir) {
     const edgeCount = cy?.edges().length;
+    const edges = [];
 
     // Creates a unidirectional edge
     if (!bidir) {
-        cy?.add({
+        edges.push({
             group: 'edges',
             data: {
                 id: `${srcId}-${dstId}#${edgeCount}`,
@@ -84,7 +93,7 @@ export function generateEdge(srcId, dstId, bidir) {
         const id1 = `${srcId}-${dstId}#${edgeCount}`;
         const id2 = `${dstId}-${srcId}#${edgeCount}`;
 
-        cy?.add([
+        edges.push(
             {
                 group: 'edges',
                 data: {
@@ -109,8 +118,9 @@ export function generateEdge(srcId, dstId, bidir) {
                     type: 'hidden'
                 }
             }
-        ]);
+        );
     }
+    return edges;
 }
 
 /**
@@ -129,22 +139,29 @@ function generateEdgeByProbability(input) {
         return;
     }
 
-    for (let i = 0; i < ids.length; i++) {
-        for (let j = i; j < ids.length; j++) {
-            if (!selfLoops && i == j) {
-                continue;
-            }
-            const guess = Math.random() * (1 - 0.01 + Number.EPSILON) + 0.01;
-            if (guess > p) {
-                continue;
-            }
-            // creates the edge with probability p
-            const srcId = ids[i];
-            const dstId = ids[j];
+    cy?.batch(() => {
+        const edges = [];
+        for (let i = 0; i < ids.length; i++) {
+            for (let j = i; j < ids.length; j++) {
+                if (!selfLoops && i == j) {
+                    continue;
+                }
+                const guess = Math.random() * (1 - 0.01 + Number.EPSILON) + 0.01;
+                if (guess > p) {
+                    continue;
+                }
+                // creates the edge with probability p
+                const srcId = ids[i];
+                const dstId = ids[j];
 
-            generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType))
+                const generated = generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType));
+                edges.push(...generated);
+            }
         }
-    }
+    
+        // @ts-ignore
+        cy?.add(edges);
+    });
 }
 
 /**

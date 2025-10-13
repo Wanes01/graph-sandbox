@@ -5,6 +5,7 @@
     import CheckBox from '$lib/components/inputs/CheckBox.svelte';
     import Select from '$lib/components/inputs/Select.svelte';
     import Color from '$lib/components/inputs/Color.svelte';
+    import Separator from '$lib/components/misc/Separator.svelte';
 
     /**
      * @param {string} type
@@ -13,7 +14,7 @@
         return appearanceData.filter((inp) => inp.type === type);
     }
 
-    const checkboxes = filterInput('checkbox');
+    const styleCheckboxes = filterInput('checkbox');
     let selects = filterInput('select');
     selects.map((sel) => {
         // @ts-ignore
@@ -27,7 +28,7 @@
 
 <ToolBox legend="Appearance" direction="col">
     <li class="flex flex-row items-center gap-3">
-        {#each checkboxes as checkbox}
+        {#each styleCheckboxes as checkbox}
             <CheckBox bind:checked={SETTINGS.ui[checkbox.id]} label={checkbox.label} />
         {/each}
     </li>

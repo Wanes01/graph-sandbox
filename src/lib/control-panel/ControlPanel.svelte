@@ -2,6 +2,7 @@
     import QuickEdit from './toolbox/QuickEdit.svelte';
     import Appearance from './toolbox/Appearance.svelte';
     import Generate from './toolbox/Generate.svelte';
+    import Performance from './toolbox/Performance.svelte';
 
     let { open, width, onToggle } = $props();
 
@@ -44,6 +45,7 @@
             >
                 <QuickEdit />
                 <Appearance />
+                <Performance />
                 <Generate />
             </div>
         </div>

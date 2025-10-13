@@ -3,9 +3,12 @@ import { LAYOUTS, SETTINGS, cy } from "./graph-config.svelte";
 export function initUISync() {
     /**
      * Changes layout on user input.
+     * Toggles animation on / off
      */
     $effect(() => {
         const layoutObj = LAYOUTS.find(l => l.name === SETTINGS.ui['layout']);
+        // @ts-ignore
+        layoutObj['animate'] = !SETTINGS.ui['disable-animation'];
         // @ts-ignore
         cy?.layout(layoutObj).run();
     });
@@ -121,5 +124,23 @@ export function initUISync() {
         cy?.style().selector('edge').style({
             'curve-style': SETTINGS.ui['curve-style']
         }).update();
+    });
+
+    // @ts-ignore
+    const renderer = cy?.renderer();
+
+    /**
+     * Toggle show / hide edges when interacting with the graph
+     */
+    $effect(() => {
+        renderer.hideEdgesOnViewport = SETTINGS.ui['hide-edges-on-viewport'];
+    });
+
+    $effect(() => {
+        renderer.textureOnViewport = SETTINGS.ui['texture-on-viewport'];
+    });
+
+    $effect(() => {
+        renderer.motionBlur = SETTINGS.ui['motion-blur'];
     });
 }

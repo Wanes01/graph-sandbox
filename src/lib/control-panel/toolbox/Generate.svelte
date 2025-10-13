@@ -4,6 +4,7 @@
     import NumberInput from '$lib/components/inputs/NumberInput.svelte';
     import Select from '$lib/components/inputs/Select.svelte';
     import CheckBox from '$lib/components/inputs/CheckBox.svelte';
+    import Separator from '$lib/components/misc/Separator.svelte';
     import { edgeGenerationData } from '$lib/static/control-panel-config.svelte';
     import {
         EDGE_GENERATION_METHODS,
@@ -91,7 +92,7 @@
     </div>
 
     <!-- SEPARATOR -->
-    <div class="my-3 border border-slate-300"></div>
+    <Separator />
 
     <!-- EDGE GENERATION -->
     <Select label={'Edge type'} options={edgeTypeOptions} bind:value={edgeType} />

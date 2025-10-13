@@ -1,4 +1,5 @@
 import { EDIT_MODES, SETTINGS, historyManager, cy } from '$lib/static/graph-config.svelte';
+import { SvelteDate } from 'svelte/reactivity';
 import { generateEdge } from './graph-generate.svelte';
 import { editElementLabel } from './label-editing.svelte';
 
@@ -42,7 +43,7 @@ export function initializeGraphListeners() {
     let lastElementClicked = null;
     const doubleClickDelay = 200; //ms
     cy?.on('tap', 'node, edge', function (e) {
-        const now = new Date().getTime();
+        const now = new SvelteDate().getTime();
         if (now - lastClickTime < doubleClickDelay
             && e.target === lastElementClicked
         ) {
@@ -54,8 +55,8 @@ export function initializeGraphListeners() {
     });
 
     /**
- * Handles adding an edge (uni- or bi-directional) depending on the edit mode.
- */
+     * Handles adding an edge (uni- or bi-directional) depending on the edit mode.
+     */
     cy?.on('tap', 'node', function (e) {
         const mode = SETTINGS.editMode;
 
@@ -75,7 +76,9 @@ export function initializeGraphListeners() {
         const src = SETTINGS.selectedNode;
         const dst = e.target;
 
-        generateEdge(src.id(), dst.id(), SETTINGS.editMode === EDIT_MODES.ADD_DOUBLE_EDGE);
+        const edges = generateEdge(src.id(), dst.id(), SETTINGS.editMode === EDIT_MODES.ADD_DOUBLE_EDGE);
+        // @ts-ignore
+        cy?.add(edges);
 
         // Resets the first node style
         SETTINGS.selectedNode.data('status', 'normal');
