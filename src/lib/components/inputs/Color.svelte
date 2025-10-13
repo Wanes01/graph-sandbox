@@ -1,7 +1,5 @@
-<!-- @ts-nocheck -->
 <script>
     // @ts-nocheck
-
     import ColorPicker from 'svelte-awesome-color-picker';
 
     let {
@@ -13,25 +11,34 @@
 
     let isPickerOpen = $state(false);
     let htmlElement = null;
+    let buttonElement = null;
+    let pickerPosition = $state({ top: 0, left: 0 });
 
     function togglePicker() {
         if (!disabled) {
             isPickerOpen = !isPickerOpen;
+            if (isPickerOpen && buttonElement) {
+                updatePickerPosition();
+            }
         }
     }
 
-    /**
-     * @param {{ target: { closest: (arg0: string) => any; }; }} event
-     */
+    function updatePickerPosition() {
+        if (buttonElement) {
+            const rect = buttonElement.getBoundingClientRect();
+            pickerPosition = {
+                top: rect.top + rect.height / 2,
+                left: rect.left
+            };
+        }
+    }
+
     function handleClickOutside(event) {
         if (htmlElement && !htmlElement.contains(event.target)) {
             isPickerOpen = false;
         }
     }
 
-    /**
-     * @param {{ detail: { hex: any; }; }} event
-     */
     function handleColorChange(event) {
         if (!disabled) {
             value = event.detail.hex;
@@ -39,7 +46,11 @@
     }
 </script>
 
-<svelte:window onclick={handleClickOutside} />
+<svelte:window
+    onclick={handleClickOutside}
+    onscroll={updatePickerPosition}
+    onresize={updatePickerPosition}
+/>
 
 <div bind:this={htmlElement} class="color-container relative w-full">
     {#if label}
@@ -49,6 +60,7 @@
     {/if}
 
     <button
+        bind:this={buttonElement}
         type="button"
         onclick={togglePicker}
         class="flex w-full flex-row items-stretch overflow-hidden rounded-lg border-1 transition-all duration-200
@@ -88,23 +100,23 @@
             </svg>
         </div>
     </button>
-
-    {#if isPickerOpen && !disabled}
-        <div
-            class="absolute top-2/3 right-full z-50 mr-2 -translate-y-1/2 rounded-lg border border-slate-200 bg-white shadow-lg shadow-black"
-        >
-            <ColorPicker
-                bind:hex={value}
-                on:input={handleColorChange}
-                isDialog={false}
-                isAlpha={false}
-            />
-        </div>
-    {/if}
 </div>
 
+{#if isPickerOpen && !disabled}
+    <div
+        class="fixed z-50 -translate-x-full -translate-y-1/2 rounded-lg border border-slate-200 bg-white shadow-lg"
+        style="top: {pickerPosition.top}px; left: {pickerPosition.left - 8}px;"
+    >
+        <ColorPicker
+            bind:hex={value}
+            on:input={handleColorChange}
+            isDialog={false}
+            isAlpha={false}
+        />
+    </div>
+{/if}
+
 <style>
-    /* Personalizzazione opzionale del color picker */
     :global(.s-_kxRDwYWTbvm) {
         font-family: inherit;
         margin: 0 !important;

@@ -10,6 +10,7 @@
         applyEdgeGen,
         generateVertices
     } from '$lib/static/graph-generate.svelte';
+    import { SETTINGS } from '$lib/static/graph-config.svelte';
 
     /**
      * @type {number | null}
@@ -51,13 +52,21 @@
     let probability = $state(0.01);
 
     /**
+     *
+     */
+    let couples = $state(0);
+
+    /**
      * @type {any}
      */
     const edgeFunctionInput = $derived({
         edgeType: edgeType,
         selfLoops: selfLoops,
-        p: probability
+        p: probability,
+        couples: couples
     });
+
+    const maxEdgesInput = (SETTINGS.maxNodes * (SETTINGS.maxNodes - 1)) / 2;
 </script>
 
 <ToolBox legend="Generate graph" direction="col" openOnMount={true}>
@@ -91,12 +100,29 @@
         options={edgeGenerationOptions}
         bind:value={selectedEdgeMethod}
     />
+
     {#if selectedEdgeMethod === EDGE_GENERATION_METHODS.PROBABILITY.id}
-        <NumberInput label="Probability" min={0.01} max={1} step={0.01} bind:value={probability} />
+        <NumberInput
+            label="Probability to connect every two edges"
+            min={0.01}
+            max={1}
+            step={0.01}
+            bind:value={probability}
+        />
+    {:else if selectedEdgeMethod === EDGE_GENERATION_METHODS.NCOUPLES.id}
+        <NumberInput
+            label="Number of total edges"
+            min={1}
+            max={maxEdgesInput}
+            step={1}
+            bind:value={couples}
+        />
     {/if}
+
     <div class="my-1">
         <CheckBox label={'Allow self-loops'} bind:checked={selfLoops} />
     </div>
+
     <Button
         color="blue"
         onclick={() => {

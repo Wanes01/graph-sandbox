@@ -1,4 +1,4 @@
-import { EDGE_TYPES, GRAPH_DATA, cy, historyManager } from "./graph-config.svelte"
+import { EDGE_TYPES, cy, historyManager } from "./graph-config.svelte"
 
 export const EDGE_GENERATION_METHODS = {
     PROBABILITY: {
@@ -10,6 +10,11 @@ export const EDGE_GENERATION_METHODS = {
         label: 'N random couples',
         fn: testing,
         id: 'NCOUPLES'
+    },
+    FULLMESH: {
+        label: 'Full mesh topology',
+        fn: fullMeshTopology,
+        id: 'FULLMESH'
     }
 }
 
@@ -19,6 +24,7 @@ export const EDGE_GENERATION_METHODS = {
  * @param {any} inp 
  */
 export function applyEdgeGen(fn, inp) {
+    cy?.remove('edge');
     fn(inp);
     historyManager?.save();
 }
@@ -35,14 +41,15 @@ function testing(input) {
  * @param {boolean} giveLabel
  */
 export function generateVertices(vertNum, giveLabel) {
+    cy?.remove('node');
     for (let i = 0; i < vertNum; i++) {
-        GRAPH_DATA.nodes++;
+        const id = cy?.nodes().length.toString();
         cy?.add({
             group: 'nodes',
             data: {
-                id: GRAPH_DATA.nodes.toString(),
+                id: id,
                 status: 'normal',
-                label: giveLabel ? `V#${GRAPH_DATA.nodes}` : ''
+                label: giveLabel ? `V#${id}` : ''
             }
         });
     }
@@ -56,7 +63,7 @@ export function generateVertices(vertNum, giveLabel) {
  * @param {boolean} bidir 
  */
 export function generateEdge(srcId, dstId, bidir) {
-    const edgeCount = ++GRAPH_DATA.edges;
+    const edgeCount = cy?.edges().length;
 
     // Creates a unidirectional edge
     if (!bidir) {
@@ -107,10 +114,9 @@ export function generateEdge(srcId, dstId, bidir) {
 }
 
 /**
- * 
  * @param {any} input
  */
-export function generateEdgeByProbability(input) {
+function generateEdgeByProbability(input) {
     const [p, selfLoops, edgeType] = [input.p, input.selfLoops, input.edgeType];
 
     if (p <= 0 || p > 1) {
@@ -149,4 +155,16 @@ function edgeTypeToBoolean(edgeType) {
         return Math.random() < 0.5;
     }
     return edgeType === EDGE_TYPES.UNDIRECTED;
+}
+
+/**
+ * @param {any} input
+ */
+function fullMeshTopology(input) {
+    const [selfLoops, edgeType] = [input.selfLoops, input.edgeType];
+    generateEdgeByProbability({
+        p: 1,
+        selfLoops: selfLoops,
+        edgeType: edgeType
+    });
 }

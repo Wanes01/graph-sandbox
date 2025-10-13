@@ -42,12 +42,8 @@ export const SETTINGS = $state({
     'show-labels': true,
     'show-weights': false,
     'curve-style': 'bezier'
-  }
-});
-
-export const GRAPH_DATA = $state({
-  nodes: 0,
-  edges: 0
+  },
+  maxNodes: 1000,
 });
 
 /**
@@ -76,15 +72,25 @@ export const LAYOUTS = [
   },
   {
     name: "breadthfirst",
-    padding: 50,
+    fit: true, // Adatta il grafo alla viewport
     directed: true,
-    spacingFactor: 1.2,
-    animate: false
+    padding: 50,
+    circle: false, // Non disporre i nodi in cerchio
+    grid: false, // IMPORTANTE: disattiva la griglia
+    spacingFactor: 1.5, // Aumenta lo spazio tra i nodi
+    boundingBox: undefined, // Usa tutto lo spazio disponibile
+    avoidOverlap: true, // Evita sovrapposizioni
+    nodeDimensionsIncludeLabels: true, // Considera le label nel calcolo delle dimensioni
+    roots: undefined, // Opzionale: specifica i nodi radice, es. '#root1, #root2'
+    maximal: false, // Se true, tutti i nodi senza predecessori diventano radici
+    animationDuration: 500,
+    animationEasing: undefined,
+    ready: undefined,
+    stop: undefined
   },
   {
     name: "cose",
     padding: 40,
-    animate: true,
     randomize: true,
     componentSpacing: 100,
     nodeRepulsion: 400000,
@@ -107,7 +113,11 @@ export const LAYOUTS = [
 
 /* All layouts must scale the graph to fit the content */
 // @ts-ignore
-LAYOUTS.forEach(layout => layout['fit'] = true);
+LAYOUTS.forEach(layout => {
+  layout['fit'] = true;
+  // @ts-ignore
+  layout['animate'] = true;
+});
 
 /**
  * Available styles for edges curves

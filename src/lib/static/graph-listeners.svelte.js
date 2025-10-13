@@ -1,4 +1,4 @@
-import { EDIT_MODES, SETTINGS, GRAPH_DATA, historyManager, cy } from '$lib/static/graph-config.svelte';
+import { EDIT_MODES, SETTINGS, historyManager, cy } from '$lib/static/graph-config.svelte';
 import { generateEdge } from './graph-generate.svelte';
 import { editElementLabel } from './label-editing.svelte';
 
@@ -20,11 +20,10 @@ export function initializeGraphListeners() {
 
         if (SETTINGS.editMode === EDIT_MODES.ADD_VERTEX) {
             const pos = e.position;
-            GRAPH_DATA.nodes++;
 
             cy?.add({
                 group: 'nodes',
-                data: { id: GRAPH_DATA.nodes.toString(), status: 'normal' },
+                data: { id: cy?.nodes().length.toString(), status: 'normal' },
                 position: { x: pos.x, y: pos.y }
             })
             // ?. => shorthand. Doesn't execute it if hm is null.
