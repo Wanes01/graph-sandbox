@@ -12,6 +12,7 @@
         generateVertices
     } from '$lib/static/graph-generate.svelte';
     import { SETTINGS } from '$lib/static/graph-config.svelte';
+    import { UIID_TO_HANDLER } from '$lib/static/graph-ui-sync.svelte';
 
     /**
      * @type {number | null}
@@ -53,9 +54,34 @@
     let probability = $state(SETTINGS.generation.minP);
 
     /**
-     *
+     * @type {number}
      */
     let couples = $state(0);
+
+    /**
+     * @type {boolean}
+     */
+    let weighted = $state(false);
+
+    /**
+     * @type {boolean}
+     */
+    let infinityValues = $state(false);
+
+    /**
+     * @type {number}
+     */
+    let minWeight = $state(0);
+
+    /**
+     * @type {number}
+     */
+    let maxWeight = $state(0);
+
+    /**
+     * @type {number}
+     */
+    let weightVariation = $state(0);
 
     /**
      * @type {any}
@@ -64,8 +90,15 @@
         edgeType: edgeType,
         selfLoops: selfLoops,
         p: probability,
-        couples: couples
+        couples: couples,
+        weighted: weighted,
+        minWeight: minWeight,
+        maxWeight: maxWeight,
+        weightVariation: weightVariation
     });
+
+    const MAX_WEIGHT = 10000;
+    const MIN_WEIGHT = -MAX_WEIGHT;
 
     const maxEdgesInput = (SETTINGS.generation.maxNodes * (SETTINGS.generation.maxNodes - 1)) / 2;
 </script>
@@ -126,18 +159,60 @@
         />
     {/if}
 
-    <div class="my-1">
+    <div class="my-1 flex flex-col gap-2">
         <CheckBox label={'Allow self-loops'} bind:checked={selfLoops} />
+        <CheckBox label={'Weighted'} bind:checked={weighted} />
     </div>
+    {#if weighted}
+        <NumberInput
+            label="Weight min. variation"
+            min={0.01}
+            max={1}
+            step={0.01}
+            def={1}
+            bind:value={weightVariation}
+        />
+        <NumberInput
+            label="Min. weight"
+            min={MIN_WEIGHT}
+            max={MAX_WEIGHT}
+            step={1}
+            def={1}
+            bind:value={minWeight}
+        />
+        <NumberInput
+            label="Max. weight"
+            min={MIN_WEIGHT}
+            max={MAX_WEIGHT}
+            step={1}
+            def={100}
+            bind:value={maxWeight}
+        />
+        <CheckBox label={'Infinity weights allowed'} bind:checked={infinityValues} />
+        {#if infinityValues}
+            <p>Select con tipo e probabilitià</p>
+        {/if}
+    {/if}
 
     <Button
         color="blue"
         onclick={() => {
-            if (selectedEdgeMethod && edgeType) {
-                // @ts-ignore
-                const fn = EDGE_GENERATION_METHODS[selectedEdgeMethod].fn;
-                applyEdgeGen(fn, edgeFunctionInput);
+            /* user must select at least the edge generation method and type of edge */
+            if (!selectedEdgeMethod || !edgeType) {
+                return;
             }
+            /* if user wants the edges to be weighted then minWeight must be <= maxWeight*/
+            if (weighted && minWeight > maxWeight) {
+                return;
+            }
+            /* turns on weight visualization automatically */
+            if (weighted) {
+                SETTINGS.ui['show-weights'] = true;
+                UIID_TO_HANDLER['show-weights']();
+            }
+            // @ts-ignore
+            const fn = EDGE_GENERATION_METHODS[selectedEdgeMethod].fn;
+            applyEdgeGen(fn, edgeFunctionInput);
         }}
     >
         <span>Generate edges</span>

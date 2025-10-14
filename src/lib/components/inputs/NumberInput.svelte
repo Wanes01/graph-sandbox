@@ -3,11 +3,16 @@
         value = $bindable(),
         label,
         placeholder = '0',
+        def = null,
         disabled = false,
         min,
         max,
         step = 1
     } = $props();
+
+    if (def) {
+        value = def;
+    }
 
     let isFocused = $state(false);
 

@@ -21,11 +21,12 @@ export const EDGE_GENERATION_METHODS = {
 
 /**
  * 
- * @param {Function} fn 
+ * @param {function} fn
  * @param {any} inp 
  */
 export function applyEdgeGen(fn, inp) {
     cy?.remove('edge');
+    // @ts-ignore
     fn(inp);
     historyManager?.save();
 }
@@ -76,10 +77,11 @@ export function generateVertices(vertNum, giveLabel) {
  * @param {string} srcId
  * @param {string} dstId 
  * @param {boolean} bidir
+ * @param {number} weight
  * 
  * @returns a list on objects representing the edges to add
  */
-export function generateEdge(srcId, dstId, bidir) {
+export function generateEdge(srcId, dstId, bidir, weight) {
     const edgeCount = cy?.edges().length;
     const edges = [];
 
@@ -91,8 +93,8 @@ export function generateEdge(srcId, dstId, bidir) {
                 id: `${srcId}-${dstId}#${edgeCount}`,
                 source: srcId,
                 target: dstId,
-                weight: 0,
-                symbolicWeight: "0",
+                weight: weight,
+                symbolicWeight: weight.toString(),
                 type: 'unidir'
             }
         });
@@ -110,8 +112,8 @@ export function generateEdge(srcId, dstId, bidir) {
                     pairId: id2,
                     source: srcId,
                     target: dstId,
-                    weight: 0,
-                    symbolicWeight: "0",
+                    weight: weight,
+                    symbolicWeight: weight.toString(),
                     type: 'bidir'
                 }
             },
@@ -122,8 +124,8 @@ export function generateEdge(srcId, dstId, bidir) {
                     pairId: id1,
                     source: dstId,
                     target: srcId,
-                    weight: 0,
-                    symbolicWeight: "0",
+                    weight: weight,
+                    symbolicWeight: weight.toString(),
                     type: 'hidden'
                 }
             }
@@ -161,7 +163,8 @@ function generateEdgeByProbability(input) {
                     const srcId = ids[i];
                     const dstId = ids[j];
 
-                    const generated = generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType));
+                    const weight = computeWeight(input);
+                    const generated = generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType), weight);
                     edges.push(...generated);
                 }
             }
@@ -170,8 +173,36 @@ function generateEdgeByProbability(input) {
         // @ts-ignore
         cy?.add(edges);
     });
+}
 
-    console.log(cy?.edges().length);
+/**
+ * @param {any} input
+ */
+function computeWeight(input) {
+    if (!input.weighted) {
+        return 0;
+    }
+    const [minWeight, maxWeight, minVar] = [input.minWeight, input.maxWeight, input.weightVariation];
+    const diff = Math.floor(Math.abs(maxWeight - minWeight));
+    const variations = Math.ceil(diff / minVar);
+    // integer between 0 and variantions (included)
+    const offset = Math.floor(Math.random() * (variations + 1));
+    const weight = minWeight + (offset * minVar);
+
+    return roundTo(weight, countDecimals(minVar));
+}
+
+const roundTo = (/** @type {number} */ num, /** @type {number} */ n) => Math.round(num * 10 ** n) / 10 ** n;
+
+/**
+ * @param {number} num
+ */
+function countDecimals(num) {
+    const str = num.toString();
+    if (str.includes('.')) {
+        return str.split('.')[1].length;
+    }
+    return 0;
 }
 
 /**
@@ -188,10 +219,6 @@ function edgeTypeToBoolean(edgeType) {
  * @param {any} input
  */
 function fullMeshTopology(input) {
-    const [selfLoops, edgeType] = [input.selfLoops, input.edgeType];
-    generateEdgeByProbability({
-        p: 1,
-        selfLoops: selfLoops,
-        edgeType: edgeType
-    });
+    input.p = 1;
+    generateEdgeByProbability(input);
 }

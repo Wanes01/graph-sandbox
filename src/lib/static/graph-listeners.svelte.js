@@ -76,7 +76,7 @@ export function initializeGraphListeners() {
         const src = SETTINGS.selectedNode;
         const dst = e.target;
 
-        const edges = generateEdge(src.id(), dst.id(), SETTINGS.editMode === EDIT_MODES.ADD_DOUBLE_EDGE);
+        const edges = generateEdge(src.id(), dst.id(), SETTINGS.editMode === EDIT_MODES.ADD_DOUBLE_EDGE, 0);
         // @ts-ignore
         cy?.add(edges);
 
