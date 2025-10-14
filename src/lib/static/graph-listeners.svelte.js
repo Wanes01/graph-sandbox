@@ -1,5 +1,4 @@
 import { EDIT_MODES, SETTINGS, historyManager, cy } from '$lib/static/graph-config.svelte';
-import { SvelteDate } from 'svelte/reactivity';
 import { generateEdge } from './graph-generate.svelte';
 import { editElementLabel } from './label-editing.svelte';
 
@@ -43,7 +42,8 @@ export function initializeGraphListeners() {
     let lastElementClicked = null;
     const doubleClickDelay = 200; //ms
     cy?.on('tap', 'node, edge', function (e) {
-        const now = new SvelteDate().getTime();
+        // eslint-disable-next-line svelte/prefer-svelte-reactivity
+        const now = new Date().getTime();
         if (now - lastClickTime < doubleClickDelay
             && e.target === lastElementClicked
         ) {

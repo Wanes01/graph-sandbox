@@ -1,4 +1,4 @@
-import { INF, cyDOM } from '$lib/static/graph-config.svelte';
+import { INF, SETTINGS } from '$lib/static/graph-config.svelte';
 
 /**
  * Updates the label of a node / an edge's weight based on
@@ -16,7 +16,7 @@ export function editElementLabel(element, isNode) {
     input.className = "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 w-[300px] text-center bg-white rounded-lg outline-none border border-slate-700 shadow-lg";
     input.style.zIndex = (1000).toString();
 
-    cyDOM?.appendChild(input);
+    SETTINGS.domElement?.appendChild(input);
     input.focus();
 
     function finish() {
@@ -39,7 +39,7 @@ export function editElementLabel(element, isNode) {
                     : newValue
             )
         }
-        cyDOM?.removeChild(input);
+        SETTINGS.domElement?.removeChild(input);
     }
 
     /**

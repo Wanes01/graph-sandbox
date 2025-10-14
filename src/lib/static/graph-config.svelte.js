@@ -203,13 +203,6 @@ export let historyManager = null;
 const MAX_HISTORY = 50;
 
 /**
- * The DOM Element representing
- * the graph.
- * @type {HTMLElement | null}
- */
-export let cyDOM = null;
-
-/**
  * @param {any} [initData]
  */
 export function initializeGraph(initData) {
