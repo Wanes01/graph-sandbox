@@ -1,4 +1,5 @@
-import { EDGE_TYPES, cy, historyManager } from "./graph-config.svelte"
+import { SETTINGS, EDGE_TYPES, cy, historyManager } from "./graph-config.svelte"
+import { changeLayout } from "./graph-ui-sync.svelte";
 
 export const EDGE_GENERATION_METHODS = {
     PROBABILITY: {
@@ -58,7 +59,15 @@ export function generateVertices(vertNum, giveLabel) {
                 }
             });
         }
-    })
+    });
+    /**
+     * For some reasons if the graph is rendered via WebGL
+     * the layout of the nodes does't get updated after the
+     * batch insertion.
+     */
+    if (SETTINGS.ui.webgl) {
+        changeLayout();
+    }
     historyManager?.save();
 }
 

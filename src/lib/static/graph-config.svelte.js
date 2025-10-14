@@ -8,25 +8,6 @@ cytoscape.use(dagre);
 cytoscape.use(cola);
 
 /**
- * Mimics an enum for the quick edit mode types.
- */
-export const EDIT_MODES = Object.freeze({
-	ADD_VERTEX: Symbol("ADD_VERTEX"),
-	ADD_EDGE: Symbol("ADD_EDGE"),
-	ADD_DOUBLE_EDGE: Symbol("ADD_DOUBLE_EDGE"),
-	ERASER: Symbol("ERASER")
-});
-
-/**
- * The types of edges as an enum.
- */
-export const EDGE_TYPES = Object.freeze({
-	UNDIRECTED: Symbol('UNDIRECTED'),
-	DIRECTED: Symbol('DIRECTED'),
-	MIXED: Symbol('MIXED')
-});
-
-/**
  * General graph settings
  */
 export const SETTINGS = $state({
@@ -58,6 +39,25 @@ export const SETTINGS = $state({
 		maxNodes: 1000,
 		minP: 0.001
 	}
+});
+
+/**
+ * Mimics an enum for the quick edit mode types.
+ */
+export const EDIT_MODES = Object.freeze({
+	ADD_VERTEX: Symbol("ADD_VERTEX"),
+	ADD_EDGE: Symbol("ADD_EDGE"),
+	ADD_DOUBLE_EDGE: Symbol("ADD_DOUBLE_EDGE"),
+	ERASER: Symbol("ERASER")
+});
+
+/**
+ * The types of edges as an enum.
+ */
+export const EDGE_TYPES = Object.freeze({
+	UNDIRECTED: Symbol('UNDIRECTED'),
+	DIRECTED: Symbol('DIRECTED'),
+	MIXED: Symbol('MIXED')
 });
 
 /**

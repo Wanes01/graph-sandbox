@@ -9,6 +9,7 @@
     let {
         value = $bindable(),
         options = [],
+        onchange = undefined,
         label,
         placeholder = 'Select...',
         disabled = false
@@ -27,6 +28,9 @@
         if (!disabled) {
             value = optionValue;
             isOpen = false;
+            if (onchange) {
+                onchange();
+            }
         }
     }
 

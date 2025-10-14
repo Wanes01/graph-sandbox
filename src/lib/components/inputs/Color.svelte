@@ -4,6 +4,7 @@
 
     let {
         value = $bindable(),
+        onchange = undefined,
         label,
         placeholder = 'Select color...',
         disabled = false
@@ -13,6 +14,16 @@
     let htmlElement = null;
     let buttonElement = null;
     let pickerPosition = $state({ top: 0, left: 0 });
+
+    /**
+     * Executes change function when the value bound
+     * to this color input changes
+     */
+    $effect(() => {
+        if (onchange && value !== undefined) {
+            onchange();
+        }
+    });
 
     function togglePicker() {
         if (!disabled) {

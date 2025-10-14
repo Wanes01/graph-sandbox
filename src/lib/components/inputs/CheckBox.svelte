@@ -1,9 +1,12 @@
 <script>
     import { blur } from 'svelte/transition';
-    let { checked = $bindable(), label, disabled = false } = $props();
+    let { checked = $bindable(), onchange = undefined, label, disabled = false } = $props();
     function toggle() {
         if (!disabled) {
             checked = !checked;
+            if (onchange) {
+                onchange();
+            }
         }
     }
 </script>
