@@ -1,6 +1,30 @@
-import { LAYOUTS, SETTINGS, cy } from "./graph-config.svelte";
+import { LAYOUTS, SETTINGS, cy, initializeGraph, getGraphInitConfig } from "./graph-config.svelte";
 
 export function initUISync() {
+    /**
+     * Rebuilds the graph using webgl
+     */
+    $effect(() => {
+        // current graph status and settings
+        const elements = cy?.json().elements;
+        const flatElements = [...(elements?.nodes ?? []), ...(elements?.edges ?? [])];
+        const zoom = cy?.zoom();
+        const pan = cy?.pan();
+
+        // destroys the current graph
+        cy?.destroy();
+
+        // inizializes the new graph with webgl enables
+        const initConfig = getGraphInitConfig();
+        initializeGraph(initConfig);
+
+        cy?.add(flatElements);
+
+        // restores zoom and pan
+        cy?.zoom(zoom);
+        cy?.pan(pan);
+    });
+
     /**
      * Changes layout on user input.
      * Toggles animation on / off

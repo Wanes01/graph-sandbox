@@ -50,7 +50,7 @@
     /**
      * @type {number}
      */
-    let probability = $state(0.01);
+    let probability = $state(SETTINGS.generation.minP);
 
     /**
      *
@@ -67,7 +67,7 @@
         couples: couples
     });
 
-    const maxEdgesInput = (SETTINGS.maxNodes * (SETTINGS.maxNodes - 1)) / 2;
+    const maxEdgesInput = (SETTINGS.generation.maxNodes * (SETTINGS.generation.maxNodes - 1)) / 2;
 </script>
 
 <ToolBox legend="Generate graph" direction="col" openOnMount={true}>
@@ -75,7 +75,13 @@
     <div class="flex flex-col gap-3">
         <div class="flex w-full flex-row items-end gap-2">
             <div class="w-1/2">
-                <NumberInput label="Vertices" min={1} max={100} step={1} bind:value={vertices} />
+                <NumberInput
+                    label="Vertices"
+                    min={1}
+                    max={SETTINGS.generation.maxNodes}
+                    step={1}
+                    bind:value={vertices}
+                />
             </div>
             <div class="w-1/2">
                 <CheckBox label="Label vertices" bind:checked={labelVertices} />
@@ -105,9 +111,9 @@
     {#if selectedEdgeMethod === EDGE_GENERATION_METHODS.PROBABILITY.id}
         <NumberInput
             label="Probability to connect every two edges"
-            min={0.01}
+            min={SETTINGS.generation.minP}
             max={1}
-            step={0.01}
+            step={SETTINGS.generation.minP}
             bind:value={probability}
         />
     {:else if selectedEdgeMethod === EDGE_GENERATION_METHODS.NCOUPLES.id}

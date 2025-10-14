@@ -37,6 +37,7 @@
 	},
 	"dependencies": {
 		"cytoscape": "^3.33.1",
+		"cytoscape-cola": "^2.5.1",
 		"cytoscape-dagre": "^2.5.0",
 		"svelte-awesome-color-picker": "^4.0.2"
 	}

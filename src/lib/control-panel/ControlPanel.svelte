@@ -44,9 +44,9 @@
                 style="opacity: {open ? '1' : '0'}; pointer-events: {open ? 'auto' : 'none'}"
             >
                 <QuickEdit />
+                <Generate />
                 <Appearance />
                 <Performance />
-                <Generate />
             </div>
         </div>
     </div>

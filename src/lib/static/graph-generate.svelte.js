@@ -146,22 +146,23 @@ function generateEdgeByProbability(input) {
                 if (!selfLoops && i == j) {
                     continue;
                 }
-                const guess = Math.random() * (1 - 0.01 + Number.EPSILON) + 0.01;
-                if (guess > p) {
-                    continue;
-                }
-                // creates the edge with probability p
-                const srcId = ids[i];
-                const dstId = ids[j];
 
-                const generated = generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType));
-                edges.push(...generated);
+                if (Math.random() < p) {
+                    // creates the edge with probability p
+                    const srcId = ids[i];
+                    const dstId = ids[j];
+
+                    const generated = generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType));
+                    edges.push(...generated);
+                }
             }
         }
-    
+
         // @ts-ignore
         cy?.add(edges);
     });
+
+    console.log(cy?.edges().length);
 }
 
 /**
