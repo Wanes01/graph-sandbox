@@ -13,6 +13,13 @@
     </p>
     {#each performanceData as checkbox}
         <li>
+            {#if checkbox.id === 'webgl'}
+                <p class="text-center text-sm">
+                    <span class="font-bold">Note:</span> rendering the nodes and edges using WebGL makes
+                    the non-interactive. All elements of the graph will need to be generated using the
+                    “Generate graph” section.
+                </p>
+            {/if}
             <CheckBox
                 bind:checked={SETTINGS.ui[checkbox.id]}
                 onchange={UIID_TO_HANDLER[checkbox.id]}

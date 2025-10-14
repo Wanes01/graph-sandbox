@@ -87,11 +87,6 @@ export const edgeGenerationData = [
 
 export const performanceData = [
     {
-        id: "webgl",
-        type: "checkbox",
-        label: "Render with WebGL (MAKES NODES AND EDGES NON-INTERACTIVE)"
-    },
-    {
         id: "disable-animation",
         type: "checkbox",
         label: "Disable graph animations",
@@ -110,5 +105,10 @@ export const performanceData = [
         id: "motion-blur",
         type: "checkbox",
         label: "Use a motion blur effect between frames",
-    }
+    },
+    {
+        id: "webgl",
+        type: "checkbox",
+        label: "Render with WebGL"
+    },
 ]

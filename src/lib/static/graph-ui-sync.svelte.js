@@ -21,7 +21,6 @@ export const UIID_TO_HANDLER = {
  * Rebuilds the graph using webgl or basic canvas
  */
 function changeRenderer() {
-    console.log('passo');
     // current graph status and settings
     const elements = cy?.json().elements;
     const flatElements = [...(elements?.nodes ?? []), ...(elements?.edges ?? [])];

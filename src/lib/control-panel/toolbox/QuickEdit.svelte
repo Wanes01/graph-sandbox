@@ -4,7 +4,7 @@
     import QuickButton from '$lib/components/inputs/QuickButton.svelte';
     import ChoiceModal from '$lib/components/modals/ChoiceModal.svelte';
     import { quickEditData } from '$lib/static/control-panel-config.svelte';
-    import { cy, historyManager } from '$lib/static/graph-config.svelte';
+    import { cy, historyManager, SETTINGS } from '$lib/static/graph-config.svelte';
 
     let showDeleteModal = $state(false);
 </script>
@@ -12,11 +12,17 @@
 <ToolBox legend="Quick edit" direction="row" openOnMount={true}>
     <li class="flex w-full flex-col gap-2">
         <div class="flex w-full flex-row gap-2">
-            {#each quickEditData as quickButton}
-                <li class="flex-1">
-                    <QuickButton {...quickButton} />
-                </li>
-            {/each}
+            {#if SETTINGS.ui.webgl}
+                <p class="text-center text-sm">
+                    Vertices and edges are non-interactive while rendering with WebGL
+                </p>
+            {:else}
+                {#each quickEditData as quickButton}
+                    <li class="flex-1">
+                        <QuickButton {...quickButton} />
+                    </li>
+                {/each}
+            {/if}
         </div>
         <Button onclick={() => (showDeleteModal = true)} color="red">
             <img src="/icons/bin.svg" alt="Delete graph" class="h-5" />
