@@ -32,8 +32,15 @@ function changeRenderer() {
 
     // inizializes the new graph with webgl enables
     const initConfig = getGraphInitConfig();
+    initConfig.elements = [];
     initializeGraph(initConfig);
 
+    if (SETTINGS.ui['show-weights']) {
+        toggleWeights();
+    }
+    if (SETTINGS.ui['show-labels']) {
+        toggleLabels();
+    }
     cy?.add(flatElements);
 
     // restores zoom and pan
