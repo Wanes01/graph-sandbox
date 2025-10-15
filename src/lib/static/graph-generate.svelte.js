@@ -138,7 +138,14 @@ export function generateEdge(srcId, dstId, bidir, weight) {
  * @param {any} input
  */
 function generateEdgeByProbability(input) {
-    const [p, selfLoops, edgeType, maxDegree] = [input.p, input.selfLoops, input.edgeType, input.maxDegree];
+    const [
+        p,
+        selfLoops,
+        edgeType,
+        maxDegree,
+        maxIndegree,
+        maxOutdegree
+    ] = [input.p, input.selfLoops, input.edgeType, input.maxDegree, input.maxIndegree, input.maxOutdegree];
 
     if (p <= 0 || p > 1) {
         return;
@@ -182,6 +189,10 @@ function generateEdgeByProbability(input) {
                     if (srcDegree + 1 > maxDegree || dstDegree + 1 > maxDegree) {
                         continue;
                     }
+                } else if (maxOutdegree !== undefined && degrees[srcId].outdeg + 1 > maxOutdegree) {
+                    continue;
+                } else if (maxIndegree !== undefined && degrees[dstId].indeg + 1 > maxIndegree) {
+                    continue;
                 }
 
                 // creates the edge with probability p

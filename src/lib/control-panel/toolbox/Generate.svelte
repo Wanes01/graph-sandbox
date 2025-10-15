@@ -24,7 +24,7 @@
      */
     let labelVertices = $state(null);
     /**
-     * @type {string | null}
+     * @type {symbol | null}
      */
     let edgeType = $state(null);
 
@@ -90,6 +90,16 @@
     let maxDegree = $state(undefined);
 
     /**
+     * @type {number | undefined}
+     */
+    let maxIndegree = $state(undefined);
+
+    /**
+     * @type {number | undefined}
+     */
+    let maxOutdegree = $state(undefined);
+
+    /**
      * @type {any}
      */
     const edgeFunctionInput = $derived({
@@ -101,7 +111,9 @@
         minWeight: minWeight,
         maxWeight: maxWeight,
         weightVariation: weightVariation,
-        maxDegree: maxDegree
+        maxDegree: maxDegree,
+        maxIndegree: maxIndegree,
+        maxOutdegree: maxOutdegree
     });
 
     const MAX_WEIGHT = 10000;
@@ -150,15 +162,40 @@
     />
 
     <div class="my-1 flex flex-col gap-2">
-        <NumberInput
-            spinner={true}
-            label="Max degree (blank if none)"
-            blankAllowed={true}
-            min={1}
-            max={SETTINGS.generation.maxNodes - 1}
-            step={1}
-            bind:value={maxDegree}
-        />
+        {#if edgeType === EDGE_TYPES.UNDIRECTED}
+            <SlidingBox>
+                <NumberInput
+                    spinner={true}
+                    label="Max degree (blank if none)"
+                    blankAllowed={true}
+                    min={1}
+                    max={SETTINGS.generation.maxNodes - 1}
+                    step={1}
+                    bind:value={maxDegree}
+                />
+            </SlidingBox>
+        {:else}
+            <SlidingBox>
+                <NumberInput
+                    spinner={true}
+                    label="Max in-degree (blank if none)"
+                    blankAllowed={true}
+                    min={1}
+                    max={SETTINGS.generation.maxNodes - 1}
+                    step={1}
+                    bind:value={maxIndegree}
+                />
+                <NumberInput
+                    spinner={true}
+                    label="Max out-degree (blank if none)"
+                    blankAllowed={true}
+                    min={1}
+                    max={SETTINGS.generation.maxNodes - 1}
+                    step={1}
+                    bind:value={maxOutdegree}
+                />
+            </SlidingBox>
+        {/if}
     </div>
 
     <Select
