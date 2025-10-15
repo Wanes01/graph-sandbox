@@ -5,3 +5,20 @@
 @source inline("border-{red,green,yellow,cyan,blue,sky,indigo,purple,rose,gray,stone}-{800,900}");
 @source inline("text-{red,green,yellow,cyan,blue,sky,indigo,purple,rose,gray,stone}-900");
 @source inline("{active:}inset-shadow-{red,green,yellow,cyan,blue,sky,indigo,purple,rose,gray,stone}-800");
+
+@layer utilities {
+  /* Chrome, Safari, Edge, Opera.
+  Disables number input spinner */
+  .no-spinner::-webkit-outer-spin-button,
+  .no-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox.
+  Disables number input spinner */
+  .no-spinner[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+}

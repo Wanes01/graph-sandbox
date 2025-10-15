@@ -135,9 +135,9 @@ export const LAYOUTS = [
 		convergenceThreshold: 0.01,
 		fit: true,
 		padding: 30,
-		handleDisconnected: true,
+		handleDisconnected: false,
 		avoidOverlap: true,
-		refresh: 1
+		refresh: 1,
 	}
 ];
 

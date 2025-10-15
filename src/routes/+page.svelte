@@ -3,7 +3,7 @@
     import ControlPanel from '$lib/control-panel/ControlPanel.svelte';
 
     let ctrlPanelOpen = $state(true);
-    let ctrlPanelWidth = $derived(ctrlPanelOpen ? 20 : 1);
+    let ctrlPanelWidth = $derived(ctrlPanelOpen ? 23 : 1);
     let graphWidth = $derived(100 - ctrlPanelWidth);
 </script>
 
