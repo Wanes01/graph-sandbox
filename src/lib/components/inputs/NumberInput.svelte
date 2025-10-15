@@ -42,6 +42,10 @@
             return;
         }
 
+        if (!blankAllowed && stringInput === '') {
+            return;
+        }
+
         /* INPUT TYPING CHECK */
         const isNegative = stringInput.startsWith('-');
         const minusOcc = occurrencesOf('-', stringInput);
@@ -91,18 +95,6 @@
             return;
         }
 
-        // applies the limits if needed
-        if (min !== undefined && number < min) {
-            value = min;
-            stringInput = min.toString();
-            return;
-        }
-        if (max !== undefined && number > max) {
-            value = max;
-            stringInput = max.toString();
-            return;
-        }
-
         // updates the numerical value
         value = number;
     }
@@ -121,11 +113,22 @@
             return;
         }
 
-        // ensures that the numerical value is syncronized
-        if (stringInput !== '' && !blankAllowed) {
+        // ensures that the numerical value is syncronized and applies limits
+        if (stringInput !== '') {
             const number = Number(stringInput);
             if (!isNaN(number)) {
-                value = number;
+                // applies the min / max limits if needed
+                if (min !== undefined && number < min) {
+                    value = min;
+                    stringInput = min.toString();
+                } else if (max !== undefined && number > max) {
+                    value = max;
+                    stringInput = max.toString();
+                } else {
+                    value = number;
+                }
+            } else if (!blankAllowed) {
+                defaultStringInput();
             }
         }
     }
