@@ -9,13 +9,18 @@
     let {
         value = $bindable(),
         options = [],
-        onchange = undefined,
         label,
+        onchange = undefined,
         placeholder = 'Select...',
-        disabled = false
+        disabled = false,
+        def = undefined
     } = $props();
 
     let isOpen = $state(false);
+
+    if (def !== undefined) {
+        value = def;
+    }
 
     function toggleDropdown() {
         if (!disabled) {

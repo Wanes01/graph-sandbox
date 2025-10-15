@@ -138,17 +138,31 @@ export function generateEdge(srcId, dstId, bidir, weight) {
  * @param {any} input
  */
 function generateEdgeByProbability(input) {
-    const [p, selfLoops, edgeType] = [input.p, input.selfLoops, input.edgeType];
+    const [p, selfLoops, edgeType, maxDegree] = [input.p, input.selfLoops, input.edgeType, input.maxDegree];
 
     if (p <= 0 || p > 1) {
         return;
     }
 
+    /** @type {string[] | undefined} */
     const ids = cy?.nodes().map(node => node.id());
 
     if (!ids) {
         return;
     }
+
+    /**
+     * @typedef {Object} Degree
+     * @property {number} indeg - grado entrante
+     * @property {number} outdeg - grado uscente
+     */
+
+    /** @type {Record<string, Degree>} */
+    const degrees = {};
+    ids.forEach(id => degrees[id] = {
+        indeg: 0,
+        outdeg: 0
+    });
 
     cy?.batch(() => {
         const edges = [];
@@ -158,14 +172,25 @@ function generateEdgeByProbability(input) {
                     continue;
                 }
 
-                if (Math.random() < p) {
-                    // creates the edge with probability p
-                    const srcId = ids[i];
-                    const dstId = ids[j];
+                const srcId = ids[i];
+                const dstId = ids[j];
 
+                // checks if src and dst have reached their max degree
+                if (maxDegree !== undefined) {
+                    const srcDegree = degrees[srcId].indeg + degrees[srcId].outdeg;
+                    const dstDegree = degrees[dstId].indeg + degrees[dstId].outdeg;
+                    if (srcDegree + 1 > maxDegree || dstDegree + 1 > maxDegree) {
+                        continue;
+                    }
+                }
+
+                // creates the edge with probability p
+                if (Math.random() < p) {
                     const weight = computeWeight(input);
                     const generated = generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType), weight);
                     edges.push(...generated);
+                    degrees[srcId].outdeg++;
+                    degrees[dstId].indeg++;
                 }
             }
         }

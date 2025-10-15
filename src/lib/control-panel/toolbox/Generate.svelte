@@ -12,7 +12,7 @@
         applyEdgeGen,
         generateVertices
     } from '$lib/static/graph-generate.svelte';
-    import { SETTINGS } from '$lib/static/graph-config.svelte';
+    import { EDGE_TYPES, SETTINGS } from '$lib/static/graph-config.svelte';
     import { UIID_TO_HANDLER } from '$lib/static/graph-ui-sync.svelte';
 
     /**
@@ -85,6 +85,11 @@
     let weightVariation = $state(0);
 
     /**
+     * @type {number | undefined}
+     */
+    let maxDegree = $state(undefined);
+
+    /**
      * @type {any}
      */
     const edgeFunctionInput = $derived({
@@ -95,10 +100,9 @@
         weighted: weighted,
         minWeight: minWeight,
         maxWeight: maxWeight,
-        weightVariation: weightVariation
+        weightVariation: weightVariation,
+        maxDegree: maxDegree
     });
-
-    $inspect(probability);
 
     const MAX_WEIGHT = 10000;
     const MIN_WEIGHT = -MAX_WEIGHT;
@@ -138,7 +142,25 @@
     <Separator />
 
     <!-- EDGE GENERATION -->
-    <Select label={'Edge type'} options={edgeTypeOptions} bind:value={edgeType} />
+    <Select
+        label={'Edge type'}
+        options={edgeTypeOptions}
+        bind:value={edgeType}
+        def={EDGE_TYPES.UNDIRECTED}
+    />
+
+    <div class="my-1 flex flex-col gap-2">
+        <NumberInput
+            spinner={true}
+            label="Max degree (blank if none)"
+            blankAllowed={true}
+            min={1}
+            max={SETTINGS.generation.maxNodes - 1}
+            step={1}
+            bind:value={maxDegree}
+        />
+    </div>
+
     <Select
         label={'Edge generation method'}
         options={edgeGenerationOptions}
@@ -149,7 +171,7 @@
         <SlidingBox>
             <NumberInput
                 label="Probability to connect every two edges"
-                placeholder={'p'}
+                placeholder={'0.001 <= p <= 1'}
                 spinner={true}
                 min={SETTINGS.generation.minP}
                 max={1}
@@ -209,16 +231,6 @@
             {/if}
         </SlidingBox>
     {/if}
-    <div class="my-1 flex flex-col gap-2">
-        <NumberInput
-            spinner={true}
-            label="Max degree (blank if none)"
-            blankAllowed={true}
-            min={1}
-            max={SETTINGS.generation.maxNodes - 1}
-            step={1}
-        />
-    </div>
 
     <Button
         color="blue"
