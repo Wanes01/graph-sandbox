@@ -98,6 +98,8 @@
         weightVariation: weightVariation
     });
 
+    $inspect(probability);
+
     const MAX_WEIGHT = 10000;
     const MIN_WEIGHT = -MAX_WEIGHT;
 

@@ -36,6 +36,10 @@
         }
     });
 
+    /**
+     * makes corrections to the user input while he is typing.
+     * Sets the number value dynamically.
+     */
     function oninput() {
         if (blankAllowed && stringInput === '') {
             value = undefined;
@@ -46,52 +50,14 @@
             return;
         }
 
-        /* INPUT TYPING CHECK */
-        const isNegative = stringInput.startsWith('-');
-        const minusOcc = occurrencesOf('-', stringInput);
-        /* Defaults input if the "-" sign is placed incorrectly or multiple times */
-        if ((isNegative && minusOcc > 1) || (!isNegative && minusOcc > 0)) {
-            defaultStringInput();
-            return;
-        }
-
-        // Permetti solo "-" durante la digitazione
-        if (stringInput === '-') {
-            return;
-        }
-
-        const decimalSep = ['.', ','];
-        // is a decimal number
-        if (decimalSep.some((s) => stringInput.includes(s))) {
-            // Defaults input if the number contains both "." and "," as decimal separators
-            if (decimalSep.every((s) => stringInput.includes(s))) {
-                defaultStringInput();
-                return;
-            }
-
-            // the separator used
-            const sep = decimalSep[stringInput.includes('.') ? 0 : 1];
-            const sepIndex = stringInput.indexOf(sep);
-            // Defaults input if the separator is placed incorrectly or multiple times
-            if (
-                sepIndex === 0 ||
-                (sepIndex > 0 && isNaN(Number(stringInput[sepIndex - 1]))) ||
-                occurrencesOf(sep, stringInput) > 1
-            ) {
-                defaultStringInput();
-                return;
-            }
-
-            /* converts the separator to comply Number() */
-            if (sep === ',') {
-                stringInput = stringInput.replace(',', '.');
-            }
+        // converts "," in "." to comply Number() funtion
+        if (stringInput.includes(',')) {
+            stringInput = stringInput.replace(',', '.');
         }
 
         /* Number value check */
         const number = Number(stringInput);
         if (isNaN(number)) {
-            defaultStringInput();
             return;
         }
 
@@ -99,6 +65,11 @@
         value = number;
     }
 
+    /**
+     * applies correction to the user input when focus
+     * is lost from this component.
+     * Sets the number statically.
+     */
     function onfocusloss() {
         isFocused = false;
 
@@ -131,14 +102,6 @@
                 defaultStringInput();
             }
         }
-    }
-
-    /**
-     * @param {string} char
-     * @param {string} string
-     */
-    function occurrencesOf(char, string) {
-        return string.split(char).length - 1;
     }
 
     function defaultStringInput() {
@@ -227,6 +190,29 @@
                 e.preventDefault();
                 return;
             }
+
+            // block the character if a separater as already been used
+            const decimalSep = ['.', ','];
+            if (decimalSep.some((s) => stringInput.includes(s))) {
+                e.preventDefault();
+                return;
+            }
+
+            // block the character if the separator is at the beginning
+            const input = e.target;
+            // @ts-ignore
+            const cursorPosition = input?.selectionStart;
+            if (cursorPosition === 0 || stringInput === '' || stringInput === '-') {
+                e.preventDefault();
+                return;
+            }
+
+            // the separator can be placed only after a digit
+            if (cursorPosition > 0 && isNaN(Number(stringInput[cursorPosition - 1]))) {
+                e.preventDefault();
+                return;
+            }
+
             return;
         }
 
