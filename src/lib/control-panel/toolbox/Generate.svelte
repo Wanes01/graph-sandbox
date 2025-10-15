@@ -2,7 +2,6 @@
     import ToolBox from '$lib/components/ToolBox.svelte';
     import Button from '$lib/components/inputs/Button.svelte';
     import NumberInput from '$lib/components/inputs/NumberInput.svelte';
-    import NumberInputV2 from '$lib/components/inputs/NumberInputV2.svelte';
     import Select from '$lib/components/inputs/Select.svelte';
     import CheckBox from '$lib/components/inputs/CheckBox.svelte';
     import Separator from '$lib/components/misc/Separator.svelte';
@@ -106,19 +105,6 @@
 </script>
 
 <ToolBox legend="Generate graph" direction="col" openOnMount={true}>
-    <div class="flex w-full flex-row">
-        <NumberInputV2
-            label={'prova'}
-            def={2}
-            disabled={false}
-            min={-10}
-            max={50}
-            step={0.1}
-            blankAllowed={true}
-            placeholder={'yeah'}
-            spinner={true}
-        />
-    </div>
     <!-- VERTICES GENERATION -->
     <div class="flex flex-col gap-3">
         <div class="flex w-full flex-row items-end gap-2">
@@ -128,6 +114,7 @@
                     min={1}
                     max={SETTINGS.generation.maxNodes}
                     step={1}
+                    spinner={true}
                     bind:value={vertices}
                 />
             </div>
@@ -160,6 +147,8 @@
         <SlidingBox>
             <NumberInput
                 label="Probability to connect every two edges"
+                placeholder={'p'}
+                spinner={true}
                 min={SETTINGS.generation.minP}
                 max={1}
                 step={SETTINGS.generation.minP}
@@ -170,6 +159,7 @@
         <SlidingBox>
             <NumberInput
                 label="Number of total edges"
+                spinner={true}
                 min={1}
                 max={maxEdgesInput}
                 step={1}
@@ -186,6 +176,7 @@
         <SlidingBox>
             <NumberInput
                 label="Weight min. variation"
+                spinner={true}
                 min={0.01}
                 max={1}
                 step={0.01}
@@ -194,6 +185,7 @@
             />
             <NumberInput
                 label="Min. weight"
+                spinner={true}
                 min={MIN_WEIGHT}
                 max={MAX_WEIGHT}
                 step={1}
@@ -202,6 +194,7 @@
             />
             <NumberInput
                 label="Max. weight"
+                spinner={true}
                 min={MIN_WEIGHT}
                 max={MAX_WEIGHT}
                 step={1}
@@ -216,7 +209,9 @@
     {/if}
     <div class="my-1 flex flex-col gap-2">
         <NumberInput
+            spinner={true}
             label="Max degree (blank if none)"
+            blankAllowed={true}
             min={1}
             max={SETTINGS.generation.maxNodes - 1}
             step={1}
