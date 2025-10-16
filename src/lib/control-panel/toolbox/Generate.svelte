@@ -285,6 +285,14 @@
                 SETTINGS.ui['show-weights'] = true;
                 UIID_TO_HANDLER['show-weights']();
             }
+            /* fixes degree sync when switching from a graph type to another */
+            if (edgeType === EDGE_TYPES.UNDIRECTED) {
+                maxIndegree = undefined;
+                maxOutdegree = undefined;
+            } else {
+                maxDegree = undefined;
+            }
+            console.table(edgeFunctionInput);
             // @ts-ignore
             const fn = EDGE_GENERATION_METHODS[selectedEdgeMethod].fn;
             applyEdgeGen(fn, edgeFunctionInput);

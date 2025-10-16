@@ -25,17 +25,10 @@ export const EDGE_GENERATION_METHODS = {
  * @param {any} inp 
  */
 export function applyEdgeGen(fn, inp) {
+    /* removes all edges */
     cy?.remove('edge');
-    /* fixed the infinite cola layout zoomout bug by setting all nodes position to the center of the screen */
-    /*     if (SETTINGS.ui.layout === 'cola') {
-            cy?.batch(() => {
-                cy?.nodes().positions(() => {
-                    return { x: 0, y: 0 };
-                })
-            });
-            changeLayout();
-        } */
     // @ts-ignore
+    /* Applyes edge generation function */
     fn(inp);
     historyManager?.save();
 }
@@ -99,18 +92,35 @@ function generateNCouples(input) {
             const dstId = idsArray[dstIndex];
 
             // edge generation
+            const bidir = edgeTypeToBoolean(edgeType);
             const weight = computeWeight(input);
-            const generated = generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType), weight);
+            const generated = generateEdge(srcId, dstId, bidir, weight);
             edges.push(...generated);
-            degrees[srcId].outdeg++;
-            degrees[dstId].indeg++;
+
+            if (edgeType === EDGE_TYPES.UNDIRECTED) {
+                degrees[srcId].outdeg++;
+                degrees[dstId].outdeg++;
+            } else {
+                degrees[srcId].outdeg++;
+                degrees[dstId].indeg++;
+                if (bidir) {
+                    degrees[srcId].indeg++;
+                    degrees[dstId].outdeg++;
+                }
+            }
 
             /* removes the nodes that cannot be used anymore from the set */
             [srcId, dstId].forEach(id => {
-                if ((maxDegree !== undefined && degrees[id].outdeg + degrees[id].indeg >= maxDegree)
-                    || (maxOutdegree !== undefined && degrees[id].outdeg >= maxOutdegree)
-                    || (maxIndegree !== undefined && degrees[id].indeg >= maxIndegree)) {
-                    idsSet.delete(id);
+                if (edgeType === EDGE_TYPES.UNDIRECTED) {
+                    if (maxDegree !== undefined && degrees[id].outdeg >= maxDegree) {
+                        idsSet.delete(id);
+                    }
+                } else {
+                    if ((maxDegree !== undefined && degrees[id].outdeg + degrees[id].indeg >= maxDegree)
+                        || (maxOutdegree !== undefined && degrees[id].outdeg >= maxOutdegree)
+                        || (maxIndegree !== undefined && degrees[id].indeg >= maxIndegree)) {
+                        idsSet.delete(id);
+                    }
                 }
             });
         }
@@ -242,7 +252,6 @@ function generateEdgeByProbability(input) {
 
     /** @type {string[] | undefined} */
     const ids = cy?.nodes().map(node => node.id());
-
     if (!ids) {
         return;
     }
@@ -252,7 +261,6 @@ function generateEdgeByProbability(input) {
      * @property {number} indeg - grado entrante
      * @property {number} outdeg - grado uscente
      */
-
     /** @type {Record<string, Degree>} */
     const degrees = {};
     ids.forEach(id => degrees[id] = {
@@ -262,35 +270,71 @@ function generateEdgeByProbability(input) {
 
     cy?.batch(() => {
         const edges = [];
+
         for (let i = 0; i < ids.length; i++) {
             for (let j = i; j < ids.length; j++) {
-                if (!selfLoops && i == j) {
+                if (!selfLoops && i === j) {
                     continue;
                 }
 
                 const srcId = ids[i];
                 const dstId = ids[j];
 
-                // checks if src and dst have reached their max degree
-                if (maxDegree !== undefined) {
-                    const srcDegree = degrees[srcId].indeg + degrees[srcId].outdeg;
-                    const dstDegree = degrees[dstId].indeg + degrees[dstId].outdeg;
-                    if (srcDegree + 1 > maxDegree || dstDegree + 1 > maxDegree) {
-                        continue;
+                // check if nodes can accept more edges based on edge type
+                let canConnect = false;
+
+                if (edgeType === EDGE_TYPES.UNDIRECTED) {
+                    // undirected graph, checks only maxDegree
+                    if (maxDegree !== undefined) {
+                        canConnect = degrees[srcId].outdeg < maxDegree &&
+                            degrees[dstId].outdeg < maxDegree;
+                    } else {
+                        canConnect = true;
                     }
-                } else if (maxOutdegree !== undefined && degrees[srcId].outdeg + 1 > maxOutdegree) {
-                    continue;
-                } else if (maxIndegree !== undefined && degrees[dstId].indeg + 1 > maxIndegree) {
+                } else {
+                    // directed or mixed graph
+                    let srcCanSend = true;
+                    let dstCanReceive = true;
+
+                    if (maxOutdegree !== undefined) {
+                        srcCanSend = degrees[srcId].outdeg < maxOutdegree;
+                    }
+                    if (maxIndegree !== undefined) {
+                        dstCanReceive = degrees[dstId].indeg < maxIndegree;
+                    }
+                    if (maxDegree !== undefined) {
+                        const srcDegree = degrees[srcId].indeg + degrees[srcId].outdeg;
+                        const dstDegree = degrees[dstId].indeg + degrees[dstId].outdeg;
+                        srcCanSend = srcCanSend && srcDegree < maxDegree;
+                        dstCanReceive = dstCanReceive && dstDegree < maxDegree;
+                    }
+
+                    canConnect = srcCanSend && dstCanReceive;
+                }
+
+                if (!canConnect) {
                     continue;
                 }
 
-                // creates the edge with probability p
+                // Creates the edge with probability p
                 if (Math.random() < p) {
+                    const bidir = edgeTypeToBoolean(edgeType);
                     const weight = computeWeight(input);
-                    const generated = generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType), weight);
+                    const generated = generateEdge(srcId, dstId, bidir, weight);
                     edges.push(...generated);
-                    degrees[srcId].outdeg++;
-                    degrees[dstId].indeg++;
+
+                    // Update degrees based on edge type
+                    if (edgeType === EDGE_TYPES.UNDIRECTED) {
+                        degrees[srcId].outdeg++;
+                        degrees[dstId].outdeg++;
+                    } else {
+                        degrees[srcId].outdeg++;
+                        degrees[dstId].indeg++;
+                        if (bidir) {
+                            degrees[srcId].indeg++;
+                            degrees[dstId].outdeg++;
+                        }
+                    }
                 }
             }
         }
