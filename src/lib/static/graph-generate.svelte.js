@@ -8,6 +8,7 @@ import { changeLayout } from "./graph-ui-sync.svelte";
  * @property {Function} fn - Funzione che implementa l'algoritmo di generazione degli archi
  * @property {string} id - Identificatore univoco del metodo
  * @property {boolean} degreeAllowed - Indica se per questa topologia ha senso limitare il grado dei nodi
+ * @property {boolean} selfLoopAllowed
  */
 
 /**
@@ -25,25 +26,36 @@ export const EDGE_GENERATION_METHODS = {
         label: 'Probability',
         fn: generateEdgeByProbability,
         id: 'PROBABILITY',
-        degreeAllowed: true
+        degreeAllowed: true,
+        selfLoopAllowed: true
     },
     NCOUPLES: {
         label: 'N random couples',
         fn: generateNCouples,
         id: 'NCOUPLES',
-        degreeAllowed: true
+        degreeAllowed: true,
+        selfLoopAllowed: true
     },
     FULLMESH: {
         label: 'Full mesh topology',
         fn: fullMeshTopology,
         id: 'FULLMESH',
-        degreeAllowed: false
+        degreeAllowed: false,
+        selfLoopAllowed: false
     },
     STAR: {
         label: 'Star topology',
-        fn: fullMeshTopology,
+        fn: generateStar,
         id: 'STAR',
-        degreeAllowed: false
+        degreeAllowed: false,
+        selfLoopAllowed: false
+    },
+    TREE: {
+        label: 'Tree topology',
+        fn: generateTree,
+        id: 'TREE',
+        degreeAllowed: false,
+        selfLoopAllowed: false
     }
 }
 
@@ -59,6 +71,40 @@ export function applyEdgeGen(fn, inp) {
     /* Applyes edge generation function */
     fn(inp);
     historyManager?.save();
+}
+
+/**
+ * @param {any} input
+ */
+function generateStar(input) {
+    const [
+        edgeType,
+        starId
+    ] = [input.edgeType, input.starId];
+
+    if (!cy?.nodes()) {
+        return;
+    }
+
+    const idsLength = cy?.nodes().length;
+    const star = starId !== undefined
+        ? starId.toString()
+        : randomIntegerExcluded(idsLength).toString();
+
+    cy?.batch(() => {
+        const edges = [];
+        for (let dst = 0; dst < idsLength; dst++) {
+            const dstId = dst.toString();
+            if (dstId !== star) {
+                const bidir = edgeTypeToBoolean(edgeType);
+                const weight = computeWeight(input);
+                const generated = generateEdge(star, dstId, bidir, weight);
+                edges.push(...generated);
+            }
+        }
+        // @ts-ignore
+        cy?.add(edges);
+    });
 }
 
 /**
@@ -417,4 +463,159 @@ function edgeTypeToBoolean(edgeType) {
 function fullMeshTopology(input) {
     input.p = 1;
     generateEdgeByProbability(input);
+}
+
+/**
+ * @typedef {Object} TREE_TYPE
+ * @property {Object} RANDOM
+ * @property {Object} NARY
+ * @property {string} RANDOM.label
+ * @property {symbol} RANDOM.value
+ * @property {string} NARY.label
+ * @property {symbol} NARY.value
+ */
+export const TREE_TYPE = {
+    RANDOM: {
+        value: Symbol("RANDOM"),
+        label: "Random tree"
+    },
+    NARY: {
+        value: Symbol("NARY"),
+        label: "N-ary tree"
+    },
+}
+
+/**
+ * @typedef {Object} TREE_GROWTH
+ * @property {Object} RANDOM
+ * @property {Object} BREADTH
+ * @property {Object} DEPTH
+ * @property {string} RANDOM.label
+ * @property {symbol} RANDOM.value
+ * @property {string} BREADTH.label
+ * @property {symbol} BREADTH.value
+ * @property {string} DEPTH.label
+ * @property {symbol} DEPTH.value
+ */
+export const TREE_GROWTH = {
+    BREADTH: {
+        value: Symbol("BREADTH"),
+        label: "Breadth-first"
+    },
+    DEPTH: {
+        value: Symbol("DEPTH"),
+        label: "Depth-first"
+    },
+    RANDOM: {
+        value: Symbol("RANDOM"),
+        label: "Random growth"
+    }
+}
+
+/**
+ * Genera un albero considerando tipo, strategia di crescita e branching factor
+ * @param {any} input
+ */
+function generateTree(input) {
+    const {
+        treeType = TREE_TYPE.RANDOM.value, // TREE_GEN.type.NARY o TREE_GEN.type.RANDOM
+        growthStrategy = TREE_GROWTH.BREADTH.value, // TREE_GEN.growth.BREADTH, DEPTH, RANDOM
+        minChildren = undefined, // opzionale, solo per treeType=RANDOM
+        maxChildren, // obbligatorio
+        rootSelection = undefined, // undefined (random) o numero (id del nodo)
+        edgeType,
+    } = input;
+
+    /** @type {string[] | undefined} */
+    const ids = cy?.nodes().map(node => node.id());
+    if (!ids || ids.length === 0) {
+        return;
+    }
+
+    // Validazione: maxChildren è obbligatorio
+    if (maxChildren === undefined || maxChildren < 1) {
+        console.error('maxChildren deve essere specificato e >= 1');
+        return;
+    }
+
+    // Seleziona il nodo radice
+    let rootId;
+    if (rootSelection !== undefined) {
+        // Verifica che l'id esista
+        const selectedId = rootSelection.toString();
+        if (ids.includes(selectedId)) {
+            rootId = selectedId;
+        } else {
+            console.warn(`Nodo con id ${rootSelection} non trovato, uso radice casuale`);
+            rootId = ids[randomIntegerExcluded(ids.length)];
+        }
+    } else {
+        // Random
+        rootId = ids[randomIntegerExcluded(ids.length)];
+    }
+
+    // Set dei nodi rimanenti da connettere
+    const remaining = ids.filter(id => id !== rootId);
+
+    // Coda/Stack per la crescita dell'albero
+    const queue = [{ id: rootId, childrenCount: 0 }];
+
+    cy?.batch(() => {
+        const edges = [];
+
+        while (remaining.length > 0 && queue.length > 0) {
+            // Seleziona il prossimo padre in base alla strategia
+            let parentIndex;
+            if (growthStrategy === TREE_GROWTH.BREADTH.value) {
+                parentIndex = 0; // FIFO - prende dal fronte
+            } else if (growthStrategy === TREE_GROWTH.DEPTH.value) {
+                parentIndex = queue.length - 1; // LIFO - prende dalla fine
+            } else {
+                // TREE_GEN.growth.RANDOM
+                parentIndex = Math.floor(Math.random() * queue.length);
+            }
+
+            const parent = queue[parentIndex];
+
+            // Determina quanti figli dare a questo nodo
+            let numChildren;
+            if (treeType === TREE_TYPE.NARY.value) {
+                // N-ario: esattamente maxChildren (o quello che rimane)
+                numChildren = Math.min(maxChildren, remaining.length);
+            } else {
+                // TREE_GEN.type.RANDOM: numero casuale tra min e max
+                const effectiveMin = minChildren !== undefined ? minChildren : 0;
+                const max = Math.min(maxChildren, remaining.length);
+                const min = Math.min(effectiveMin, max);
+                numChildren = randomIntegerExcluded(max - min + 1) + min;
+            }
+
+            // Aggiungi i figli
+            let childrenAdded = 0;
+            for (let i = 0; i < numChildren && remaining.length > 0; i++) {
+                // Seleziona un figlio casuale dai nodi rimanenti
+                const childIndex = Math.floor(Math.random() * remaining.length);
+                const childId = remaining.splice(childIndex, 1)[0];
+
+                // Crea l'arco
+                const bidir = edgeTypeToBoolean(edgeType);
+                const weight = computeWeight(input);
+                const generated = generateEdge(parent.id, childId, bidir, weight);
+                edges.push(...generated);
+
+                // Aggiungi il figlio alla coda per futuri figli
+                queue.push({ id: childId, childrenCount: 0 });
+                childrenAdded++;
+            }
+
+            // Rimuovi il padre dalla coda se ha raggiunto il numero massimo di figli
+            parent.childrenCount += childrenAdded;
+            if (parent.childrenCount >= maxChildren || remaining.length === 0) {
+                queue.splice(parentIndex, 1);
+            }
+        }
+
+        // @ts-ignore
+        cy?.add(edges);
+    });
 }

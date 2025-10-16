@@ -109,6 +109,6 @@ export const performanceData = [
     {
         id: "webgl",
         type: "checkbox",
-        label: "Render with WebGL"
+        label: "Render with WebGL [EXPERIMENTAL]"
     },
 ]

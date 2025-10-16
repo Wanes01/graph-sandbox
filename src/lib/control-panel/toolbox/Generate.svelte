@@ -9,6 +9,8 @@
     import { edgeGenerationData } from '$lib/static/control-panel-config.svelte';
     import {
         EDGE_GENERATION_METHODS,
+        TREE_GROWTH,
+        TREE_TYPE,
         applyEdgeGen,
         generateVertices
     } from '$lib/static/graph-generate.svelte';
@@ -37,6 +39,10 @@
             value: genType
         };
     });
+
+    const treeTypeOptions = Object.values(TREE_TYPE);
+
+    const treeGrowthOptions = Object.values(TREE_GROWTH);
 
     let selectedEdgeMethod = $state(null);
 
@@ -96,6 +102,11 @@
     let maxOutdegree = $state(undefined);
 
     /**
+     * @type {number | undefined}
+     */
+    let starId = $state(undefined);
+
+    /**
      * @type {any}
      */
     const edgeFunctionInput = $derived({
@@ -109,7 +120,8 @@
         weightVariation: weightVariation,
         maxDegree: maxDegree,
         maxIndegree: maxIndegree,
-        maxOutdegree: maxOutdegree
+        maxOutdegree: maxOutdegree,
+        starId
     });
 
     const MAX_WEIGHT = 10000;
@@ -223,17 +235,24 @@
             <NumberInput
                 label="Star id (blank to pick a random vertex)"
                 spinner={true}
-                min={1}
-                max={cy?.nodes().length}
+                min={0}
+                max={cy?.nodes() ? cy?.nodes().length - 1 : 0}
                 step={1}
                 blankAllowed={true}
-                bind:value={couples}
+                bind:value={starId}
             />
+        </SlidingBox>
+    {:else if selectedEdgeMethod === EDGE_GENERATION_METHODS.TREE.id}
+        <SlidingBox dir="col" gap={2}>
+            <Select label="Tree type" options={treeTypeOptions} def={TREE_TYPE.RANDOM.value} />
+            <Select label="Growth type" options={treeGrowthOptions} />
         </SlidingBox>
     {/if}
 
     <div class="my-1 flex flex-col gap-2">
-        <CheckBox label={'Allow self-loops'} bind:checked={selfLoops} />
+        {#if selectedEdgeMethod && EDGE_GENERATION_METHODS[selectedEdgeMethod].selfLoopAllowed}
+            <CheckBox label={'Allow self-loops'} bind:checked={selfLoops} />
+        {/if}
         <CheckBox label={'Weighted'} bind:checked={weighted} />
     </div>
     {#if weighted}
@@ -297,7 +316,10 @@
             if (!degAllowed || edgeType !== EDGE_TYPES.UNDIRECTED) {
                 maxDegree = undefined;
             }
-            console.table(edgeFunctionInput);
+
+            if (!EDGE_GENERATION_METHODS[selectedEdgeMethod].selfLoopAllowed) {
+                selfLoops = false;
+            }
             // @ts-ignore
             const fn = EDGE_GENERATION_METHODS[selectedEdgeMethod].fn;
             applyEdgeGen(fn, edgeFunctionInput);
