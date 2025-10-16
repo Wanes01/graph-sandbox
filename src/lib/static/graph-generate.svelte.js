@@ -9,7 +9,7 @@ export const EDGE_GENERATION_METHODS = {
     },
     NCOUPLES: {
         label: 'N random couples',
-        fn: testing,
+        fn: generateNCouples,
         id: 'NCOUPLES'
     },
     FULLMESH: {
@@ -26,6 +26,15 @@ export const EDGE_GENERATION_METHODS = {
  */
 export function applyEdgeGen(fn, inp) {
     cy?.remove('edge');
+    /* fixed the infinite cola layout zoomout bug by setting all nodes position to the center of the screen */
+    /*     if (SETTINGS.ui.layout === 'cola') {
+            cy?.batch(() => {
+                cy?.nodes().positions(() => {
+                    return { x: 0, y: 0 };
+                })
+            });
+            changeLayout();
+        } */
     // @ts-ignore
     fn(inp);
     historyManager?.save();
@@ -34,8 +43,88 @@ export function applyEdgeGen(fn, inp) {
 /**
  * @param {any} input
  */
-function testing(input) {
-    console.log(input);
+function generateNCouples(input) {
+    const [
+        couples,
+        selfLoops,
+        edgeType,
+        maxDegree,
+        maxIndegree,
+        maxOutdegree
+    ] = [input.couples, input.selfLoops, input.edgeType, input.maxDegree, input.maxIndegree, input.maxOutdegree];
+
+    /** @type {string[] | undefined} */
+    const ids = cy?.nodes().map(node => node.id());
+
+    if (!ids) {
+        return;
+    }
+
+    /**
+     * @typedef {Object} Degree
+     * @property {number} indeg - grado entrante
+     * @property {number} outdeg - grado uscente
+     */
+
+    /** @type {Record<string, Degree>} */
+    const degrees = {};
+    ids.forEach(id => degrees[id] = {
+        indeg: 0,
+        outdeg: 0
+    });
+
+
+    cy?.batch(() => {
+        const edges = [];
+        // eslint-disable-next-line svelte/prefer-svelte-reactivity
+        let idsSet = new Set(ids);
+        while (edges.length < couples && idsSet.size > 0) {
+
+            // if self loops are not allowed we need at least two different nodes
+            if (!selfLoops && idsSet.size < 2) {
+                break;
+            }
+
+            // array view of the set (used to generate the random indexes)
+            const idsArray = Array.from(idsSet);
+            const srcIndex = randomIntegerExcluded(idsArray.length);
+            let dstIndex = randomIntegerExcluded(idsArray.length);
+            if (!selfLoops) {
+                while (dstIndex === srcIndex) {
+                    dstIndex = randomIntegerExcluded(idsArray.length);
+                }
+            }
+
+            const srcId = idsArray[srcIndex];
+            const dstId = idsArray[dstIndex];
+
+            // edge generation
+            const weight = computeWeight(input);
+            const generated = generateEdge(srcId, dstId, edgeTypeToBoolean(edgeType), weight);
+            edges.push(...generated);
+            degrees[srcId].outdeg++;
+            degrees[dstId].indeg++;
+
+            /* removes the nodes that cannot be used anymore from the set */
+            [srcId, dstId].forEach(id => {
+                if ((maxDegree !== undefined && degrees[id].outdeg + degrees[id].indeg >= maxDegree)
+                    || (maxOutdegree !== undefined && degrees[id].outdeg >= maxOutdegree)
+                    || (maxIndegree !== undefined && degrees[id].indeg >= maxIndegree)) {
+                    idsSet.delete(id);
+                }
+            });
+        }
+
+        // @ts-ignore
+        cy?.add(edges);
+    });
+}
+
+/**
+ * @param {number} num
+ */
+function randomIntegerExcluded(num) {
+    return Math.floor(Math.random() * num);
 }
 
 /**
