@@ -3,8 +3,8 @@ import { INF, SETTINGS } from '$lib/static/graph-config.svelte';
 /**
  * Updates the label of a node / an edge's weight based on
  * user input.
- * @param {import('cytoscape').NodeSingular | import('cytoscape').EdgeSingular} element 
- * @param {boolean} isNode 
+ * @param {import('cytoscape').NodeSingular | import('cytoscape').EdgeSingular} element
+ * @param {boolean} isNode
  */
 export function editElementLabel(element, isNode) {
     const input = document.createElement('input');
@@ -12,9 +12,12 @@ export function editElementLabel(element, isNode) {
     input.value = isNode
         ? element.data('label') || ''
         : element.data('symbolicWeight');
-
     input.className = "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 w-[300px] text-center bg-white rounded-lg outline-none border border-slate-700 shadow-lg";
     input.style.zIndex = (1000).toString();
+
+    input.placeholder = isNode
+        ? "Insert label (optional)"
+        : "Insert weight (defaults to 0)"
 
     SETTINGS.domElement?.appendChild(input);
     input.focus();
@@ -23,46 +26,47 @@ export function editElementLabel(element, isNode) {
         const newValue = isNode
             ? input.value.trim()
             : textToEdgeWeight(input.value);
-        element.data(isNode ? 'label' : 'weight', newValue);
 
-        /*
-        Edges with INF/-INF weights must show a
-        symbolic representation instead of
-        a large number
-         */
-        if (!isNode) {
+        if (isNode) {
+            /* sets the value. The visualization is handled by a separate function. */
+            element.data('label', newValue);
+        } else {
+            element.data('weight', newValue);
+            /*
+             Edges with INF/-INF weights must show a
+             symbolic representation instead of
+             a large number
+             */
             const weight = Number(newValue);
             element.data(
                 'symbolicWeight',
                 weight >= INF || weight <= -INF
                     ? weight >= INF ? '∞' : '-∞'
                     : newValue
-            )
+            );
         }
+
         SETTINGS.domElement?.removeChild(input);
     }
 
     /**
-       * @param {string} inp
-       */
+     * @param {string} inp
+     */
     function textToEdgeWeight(inp) {
         if (typeof inp !== "string") {
             return 0;
         }
         const s = inp.trim().toLowerCase();
-
         if (s === "inf" || s === "+inf" || s === "∞") {
             return INF;
         }
         if (s === "-inf" || s === "-∞") {
             return -INF;
         }
-
         // checks if the string is a valid number (integer or floating)
         if (/^[+-]?\d+(\.\d+)?$/.test(s)) {
             return Number(s);
         }
-
         return 0;
     }
 
@@ -70,4 +74,19 @@ export function editElementLabel(element, isNode) {
     input.addEventListener('keydown', e => {
         if (e.key === 'Enter') finish();
     });
+}
+
+/**
+ * Generates the final label to show to the user.
+ * The format is "label#id" but the label may be
+ * blank. This function must only be used
+ * inside cytoscape style.
+ * @param {import('cytoscape').NodeSingular} ele
+ * @returns {string}
+ */
+export function getNodeDisplayLabel(ele) {
+    const customLabel = ele.data('label');
+    const id = ele.data('id');
+
+    return `${customLabel}#${id}`;
 }

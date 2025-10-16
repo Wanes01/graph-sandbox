@@ -23,7 +23,7 @@ export function initializeGraphListeners() {
 
             cy?.add({
                 group: 'nodes',
-                data: { id: cy?.nodes().length.toString(), status: 'normal' },
+                data: { id: cy?.nodes().length.toString(), status: 'normal', label: '' },
                 position: { x: pos.x, y: pos.y }
             })
             // ?. => shorthand. Doesn't execute it if hm is null.

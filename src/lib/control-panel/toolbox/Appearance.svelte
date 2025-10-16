@@ -27,7 +27,7 @@
 </script>
 
 <ToolBox legend="Appearance" direction="col">
-    <li class="flex flex-row items-center gap-3">
+    <li class="flex flex-col items-center gap-3">
         {#each styleCheckboxes as checkbox}
             <CheckBox
                 bind:checked={SETTINGS.ui[checkbox.id]}

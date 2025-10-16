@@ -1,21 +1,49 @@
 import { SETTINGS, EDGE_TYPES, cy, historyManager } from "./graph-config.svelte"
 import { changeLayout } from "./graph-ui-sync.svelte";
 
+
+/**
+ * @typedef {Object} EdgeGenerationMethod
+ * @property {string} label - Etichetta descrittiva da mostrare nell'interfaccia utente
+ * @property {Function} fn - Funzione che implementa l'algoritmo di generazione degli archi
+ * @property {string} id - Identificatore univoco del metodo
+ * @property {boolean} degreeAllowed - Indica se per questa topologia ha senso limitare il grado dei nodi
+ */
+
+/**
+ * Metodi disponibili per la generazione degli archi nel grafo.
+ * Ogni metodo definisce una strategia diversa per creare connessioni tra i nodi.
+ * 
+ * @type {Record<string, EdgeGenerationMethod>}
+ * 
+ * PROBABILITY - Genera archi con probabilità p tra ogni coppia di nodi (modello Erdős–Rényi)
+ * NCOUPLES - Genera fino a N coppie di nodi connessi casualmente
+ * FULLMESH - Genera una topologia a maglia completa (ogni nodo connesso a tutti gli altri)
+ */
 export const EDGE_GENERATION_METHODS = {
     PROBABILITY: {
         label: 'Probability',
         fn: generateEdgeByProbability,
         id: 'PROBABILITY',
+        degreeAllowed: true
     },
     NCOUPLES: {
         label: 'N random couples',
         fn: generateNCouples,
-        id: 'NCOUPLES'
+        id: 'NCOUPLES',
+        degreeAllowed: true
     },
     FULLMESH: {
         label: 'Full mesh topology',
         fn: fullMeshTopology,
-        id: 'FULLMESH'
+        id: 'FULLMESH',
+        degreeAllowed: false
+    },
+    STAR: {
+        label: 'Star topology',
+        fn: fullMeshTopology,
+        id: 'STAR',
+        degreeAllowed: false
     }
 }
 
@@ -139,9 +167,8 @@ function randomIntegerExcluded(num) {
 
 /**
  * @param {number} vertNum
- * @param {boolean} giveLabel
  */
-export function generateVertices(vertNum, giveLabel) {
+export function generateVertices(vertNum) {
     cy?.remove('node');
     /**
      * Batch operation to improve performances:
@@ -155,7 +182,7 @@ export function generateVertices(vertNum, giveLabel) {
                 data: {
                     id: id,
                     status: 'normal',
-                    label: giveLabel ? `V#${id}` : ''
+                    label: ''
                 }
             });
         }

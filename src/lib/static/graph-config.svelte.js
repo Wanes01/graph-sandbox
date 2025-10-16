@@ -2,6 +2,7 @@ import { GraphHistoryManager } from "$lib/static/graph-history.svelte";
 import dagre from "cytoscape-dagre";
 import cytoscape from "cytoscape";
 import cola from 'cytoscape-cola';
+import { getNodeDisplayLabel } from "./label-editing.svelte";
 
 // external layouts for cytoscape js
 cytoscape.use(dagre);
@@ -215,12 +216,12 @@ const INIT_GRAPH_CONFIG = $derived({
 	container: SETTINGS.domElement,
 
 	elements: [
-		{ data: { id: 'a', label: 'Nodo A', status: 'normal' } },
-		{ data: { id: 'b', label: 'Nodo B', status: 'normal' } },
-		{ data: { id: 'c', label: 'Nodo C', status: 'normal' } },
-		{ data: { id: 'ab', source: 'a', target: 'b', weight: 0, symbolicWeight: '0' } },
-		{ data: { id: 'bc', source: 'b', target: 'c', weight: 0, symbolicWeight: '0' } },
-		{ data: { id: 'ca', source: 'c', target: 'a', weight: 0, symbolicWeight: '0' } }
+		{ data: { id: '0', label: '', status: 'normal' } },
+		{ data: { id: '1', label: '', status: 'normal' } },
+		{ data: { id: '2', label: '', status: 'normal' } },
+		{ data: { id: '01', source: '0', target: '1', weight: 0, symbolicWeight: '0' } },
+		{ data: { id: '12', source: '1', target: '2', weight: 0, symbolicWeight: '0' } },
+		{ data: { id: '20', source: '2', target: '0', weight: 0, symbolicWeight: '0' } }
 	],
 
 	layout: { name: SETTINGS.ui.layout },
@@ -256,7 +257,7 @@ const INIT_GRAPH_CONFIG = $derived({
 			selector: 'node[label]',
 			style: {
 				'background-color': SETTINGS.ui['vertex-color'],
-				label: 'data(label)',
+				label: getNodeDisplayLabel,
 				color: 'white',
 				'text-valign': 'center',
 				'text-outline-color': SETTINGS.ui['vertex-color'],

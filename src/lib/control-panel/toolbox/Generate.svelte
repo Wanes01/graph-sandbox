@@ -12,17 +12,13 @@
         applyEdgeGen,
         generateVertices
     } from '$lib/static/graph-generate.svelte';
-    import { EDGE_TYPES, SETTINGS } from '$lib/static/graph-config.svelte';
+    import { cy, EDGE_TYPES, SETTINGS } from '$lib/static/graph-config.svelte';
     import { UIID_TO_HANDLER } from '$lib/static/graph-ui-sync.svelte';
 
     /**
      * @type {number | null}
      */
     let vertices = $state(null);
-    /**
-     * @type {boolean | null}
-     */
-    let labelVertices = $state(null);
     /**
      * @type {symbol | null}
      */
@@ -125,25 +121,18 @@
 <ToolBox legend="Generate graph" direction="col" openOnMount={true}>
     <!-- VERTICES GENERATION -->
     <div class="flex flex-col gap-3">
-        <div class="flex w-full flex-row items-end gap-2">
-            <div class="w-1/2">
-                <NumberInput
-                    label="Vertices"
-                    min={1}
-                    max={SETTINGS.generation.maxNodes}
-                    step={1}
-                    spinner={true}
-                    bind:value={vertices}
-                />
-            </div>
-            <div class="w-1/2">
-                <CheckBox label="Label vertices" bind:checked={labelVertices} />
-            </div>
-        </div>
+        <NumberInput
+            label="Vertices"
+            min={1}
+            max={SETTINGS.generation.maxNodes}
+            step={1}
+            spinner={true}
+            bind:value={vertices}
+        />
         <Button
             color="blue"
             onclick={() => {
-                generateVertices(vertices || 0, labelVertices || false);
+                generateVertices(vertices || 0);
             }}
         >
             <span>Generate vertices</span>
@@ -161,48 +150,50 @@
         def={EDGE_TYPES.UNDIRECTED}
     />
 
-    <div class="my-1 flex flex-col gap-2">
-        {#if edgeType === EDGE_TYPES.UNDIRECTED}
-            <SlidingBox>
-                <NumberInput
-                    spinner={true}
-                    label="Max degree (blank if none)"
-                    blankAllowed={true}
-                    min={1}
-                    max={SETTINGS.generation.maxNodes - 1}
-                    step={1}
-                    bind:value={maxDegree}
-                />
-            </SlidingBox>
-        {:else}
-            <SlidingBox>
-                <NumberInput
-                    spinner={true}
-                    label="Max in-degree (blank if none)"
-                    blankAllowed={true}
-                    min={1}
-                    max={SETTINGS.generation.maxNodes - 1}
-                    step={1}
-                    bind:value={maxIndegree}
-                />
-                <NumberInput
-                    spinner={true}
-                    label="Max out-degree (blank if none)"
-                    blankAllowed={true}
-                    min={1}
-                    max={SETTINGS.generation.maxNodes - 1}
-                    step={1}
-                    bind:value={maxOutdegree}
-                />
-            </SlidingBox>
-        {/if}
-    </div>
-
     <Select
         label={'Edge generation method'}
         options={edgeGenerationOptions}
         bind:value={selectedEdgeMethod}
     />
+
+    <div class="flex flex-col gap-2">
+        {#if selectedEdgeMethod && EDGE_GENERATION_METHODS[selectedEdgeMethod].degreeAllowed}
+            {#if edgeType === EDGE_TYPES.UNDIRECTED}
+                <SlidingBox>
+                    <NumberInput
+                        spinner={true}
+                        label="Max degree (blank if none)"
+                        blankAllowed={true}
+                        min={1}
+                        max={SETTINGS.generation.maxNodes - 1}
+                        step={1}
+                        bind:value={maxDegree}
+                    />
+                </SlidingBox>
+            {:else}
+                <SlidingBox dir={'col'} gap={2}>
+                    <NumberInput
+                        spinner={true}
+                        label="Max in-degree (blank if none)"
+                        blankAllowed={true}
+                        min={1}
+                        max={SETTINGS.generation.maxNodes - 1}
+                        step={1}
+                        bind:value={maxIndegree}
+                    />
+                    <NumberInput
+                        spinner={true}
+                        label="Max out-degree (blank if none)"
+                        blankAllowed={true}
+                        min={1}
+                        max={SETTINGS.generation.maxNodes - 1}
+                        step={1}
+                        bind:value={maxOutdegree}
+                    />
+                </SlidingBox>
+            {/if}
+        {/if}
+    </div>
 
     {#if selectedEdgeMethod === EDGE_GENERATION_METHODS.PROBABILITY.id}
         <SlidingBox>
@@ -224,6 +215,18 @@
                 min={1}
                 max={maxEdgesInput}
                 step={1}
+                bind:value={couples}
+            />
+        </SlidingBox>
+    {:else if selectedEdgeMethod === EDGE_GENERATION_METHODS.STAR.id}
+        <SlidingBox>
+            <NumberInput
+                label="Star id (blank to pick a random vertex)"
+                spinner={true}
+                min={1}
+                max={cy?.nodes().length}
+                step={1}
+                blankAllowed={true}
                 bind:value={couples}
             />
         </SlidingBox>
@@ -286,10 +289,12 @@
                 UIID_TO_HANDLER['show-weights']();
             }
             /* fixes degree sync when switching from a graph type to another */
-            if (edgeType === EDGE_TYPES.UNDIRECTED) {
+            const degAllowed = EDGE_GENERATION_METHODS[selectedEdgeMethod].degreeAllowed;
+            if (!degAllowed || edgeType === EDGE_TYPES.UNDIRECTED) {
                 maxIndegree = undefined;
                 maxOutdegree = undefined;
-            } else {
+            }
+            if (!degAllowed || edgeType !== EDGE_TYPES.UNDIRECTED) {
                 maxDegree = undefined;
             }
             console.table(edgeFunctionInput);
